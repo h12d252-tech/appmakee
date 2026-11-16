@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>신성여고 AI 학교 일정 통합 관리 시스템 (School Life AI Planner)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">🏫</div>
+        <div class="brand-text">
+          <span class="school-badge">신성여자고등학교</span>
+          <h1 class="brand-title">AI 스마트 학교 일정 플래너</h1>
+        </div>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearchInput" placeholder="일정, 과목, 준비물 검색..." autocomplete="off">
+        <button id="clearSearchBtn" class="clear-btn" style="display:none;">✕</button>
+      </div>
+
+      <!-- User Role Switcher -->
+      <div class="user-role-section">
+        <div class="role-selector-card">
+          <label for="userRoleSelect" class="role-label">현재 사용자 모드:</label>
+          <div class="role-controls">
+            <select id="userRoleSelect" class="role-dropdown">
+              <option value="teacher">🧑‍🏫 교사 (학사관리자: 전체 권한)</option>
+              <option value="president" selected>👑 반장 (2학년 10반 반장: 학급 권한)</option>
+              <option value="student">🎒 학생 (2학년 10반 학생: 조회/체크)</option>
+            </select>
+            <div id="userScopeInfo" class="user-scope-badge">2학년 10반</div>
+          </div>
+        </div>
+        <button id="openNewEventBtn" class="btn btn-primary btn-add-event">
+          <span class="btn-icon">➕</span> 새 일정 등록
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-layout">
+    <!-- Sidebar / Quick Dashboards -->
+    <aside class="sidebar">
+      <!-- AI Smart Assistant Card -->
+      <section class="card ai-assistant-card">
+        <div class="card-header ai-header">
+          <div class="ai-badge">🤖 AI 스마트 도우미</div>
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="card-body">
+          <p class="ai-intro">자연어로 일정을 말하면 AI가 스스로 항목을 분석해 입력 폼을 채워줍니다.</p>
+          <div class="ai-input-wrap">
+            <textarea id="aiQuickInput" placeholder="예: 다음주 금요일 2학년 10반 인공지능 기초 수행평가 발표, 준비물 노트북" rows="2"></textarea>
+            <button id="aiParseBtn" class="btn btn-ai-action">
+              <span>⚡ AI 일정 자동 완성</span>
+            </button>
+          </div>
+          <div id="aiWorkloadAlert" class="ai-workload-alert">
+            <!-- Dynamically populated AI workload/conflict warning -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Today's Briefing -->
+      <section class="card today-card">
+        <div class="card-header">
+          <h3>📌 오늘의 학사 브리핑</h3>
+          <span id="currentDateDisplay" class="date-chip">2026.11.16</span>
+        </div>
+        <div class="card-body">
+          <div id="todayEventsList" class="compact-event-list">
+            <!-- Dynamically populated today's events -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Upcoming Assessments (D-Day) -->
+      <section class="card upcoming-card">
+        <div class="card-header">
+          <h3>⏳ 다가오는 수행평가 & 시험</h3>
+          <span class="badge-count" id="upcomingCount">3</span>
+        </div>
+        <div class="card-body">
+          <div id="upcomingAssessmentList" class="dday-event-list">
+            <!-- Dynamically populated upcoming assessments -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Student Supplies Checklist -->
+      <section class="card checklist-card">
+        <div class="card-header">
+          <h3>🎒 나의 준비물 체크리스트</h3>
+          <button id="clearCompletedChecksBtn" class="btn-text">완료 정리</button>
+        </div>
+        <div class="card-body">
+          <div class="checklist-progress-bar">
+            <div id="checklistProgressFill" class="progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="checklist-status-text">
+            <span id="checklistStats">0 / 0 항목 준비 완료</span>
+            <span id="checklistPercent">0%</span>
+          </div>
+          <div id="suppliesChecklistContainer" class="checklist-items">
+            <!-- Dynamically populated supplies items -->
+          </div>
+        </div>
+      </section>
+
+      <!-- System Utility Actions -->
+      <div class="sidebar-footer">
+        <button id="resetDemoDataBtn" class="btn btn-outline-secondary btn-sm w-full">
+          🔄 기본 예시 데이터로 초기화
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="content-area">
+      <!-- Navigation Tabs: Scope & Grade/Class Filter -->
+      <div class="navigation-panel">
+        <div class="scope-tabs-container">
+          <div class="scope-tabs" role="tablist">
+            <button class="scope-tab active" data-scope="school">
+              <span class="tab-icon">🏫</span> 학교 전체 일정
+            </button>
+            <button class="scope-tab" data-scope="grade">
+              <span class="tab-icon">🎓</span> 학년별 일정
+            </button>
+            <button class="scope-tab" data-scope="class">
+              <span class="tab-icon">👥</span> 반별 일정 (수행평가/과제)
+            </button>
+            <button class="scope-tab" data-scope="my">
+              <span class="tab-icon">⭐</span> 내 맞춤 일정 모아보기
+            </button>
+          </div>
+        </div>
+
+        <!-- Grade & Class Secondary Filter Bar -->
+        <div class="filter-toolbar">
+          <!-- Grade Selector (Visible in Grade & Class tabs) -->
+          <div id="gradeFilterGroup" class="filter-group" style="display:none;">
+            <span class="filter-label">학년 선택:</span>
+            <div class="pill-tabs" id="gradePillTabs">
+              <button class="pill-tab" data-grade="1">1학년</button>
+              <button class="pill-tab active" data-grade="2">2학년</button>
+              <button class="pill-tab" data-grade="3">3학년</button>
+            </div>
+          </div>
+
+          <!-- Class Selector (Visible in Class tab) -->
+          <div id="classFilterGroup" class="filter-group" style="display:none;">
+            <span class="filter-label">반 선택:</span>
+            <select id="classSelectDropdown" class="form-select-sm">
+              <option value="1">1반</option>
+              <option value="2">2반</option>
+              <option value="3">3반</option>
+              <option value="4">4반</option>
+              <option value="5">5반</option>
+              <option value="6">6반</option>
+              <option value="7">7반</option>
+              <option value="8">8반</option>
+              <option value="9">9반</option>
+              <option value="10" selected>10반</option>
+            </select>
+          </div>
+
+          <!-- Category Chips Filter -->
+          <div class="filter-group category-filter-group">
+            <span class="filter-label">유형 필터:</span>
+            <div class="category-chips" id="categoryChips">
+              <button class="cat-chip active" data-cat="all">전체</button>
+              <button class="cat-chip" data-cat="assessment">🟣 수행평가/과제</button>
+              <button class="cat-chip" data-cat="exam">🔴 지필평가/모의고사</button>
+              <button class="cat-chip" data-cat="school_event">🟢 학교행사</button>
+              <button class="cat-chip" data-cat="grade_event">🟡 학년행사</button>
+              <button class="cat-chip" data-cat="class_event">🔵 학급행사</button>
+            </div>
+          </div>
+
+          <!-- View Mode Toggle (Calendar vs List vs Assessment Kanban) -->
+          <div class="view-mode-toggle">
+            <button class="view-btn active" id="viewCalendarBtn" title="달력 뷰">
+              📅 달력
+            </button>
+            <button class="view-btn" id="viewListBtn" title="목록 뷰">
+              📑 목록
+            </button>
+            <button class="view-btn" id="viewAssessmentBtn" title="수행평가 집중 보드">
+              🎯 수행평가 보드
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scope Description Banner -->
+      <div id="scopeBanner" class="scope-banner">
+        <div class="banner-content">
+          <span class="banner-icon">🏫</span>
+          <div class="banner-texts">
+            <h2 id="scopeBannerTitle">학교 전체 일정</h2>
+            <p id="scopeBannerSubtitle">개학식, 방학식, 정기고사, 교내 축제 등 전교생 대상의 주요 학사일정입니다.</p>
+          </div>
+        </div>
+        <div class="banner-stat">
+          <span class="stat-number" id="currentViewEventCount">0</span>
+          <span class="stat-label">개 일정 표시 중</span>
+        </div>
+      </div>
+
+      <!-- MAIN VIEW 1: Monthly Calendar -->
+      <section id="calendarViewSection" class="view-section active">
+        <div class="calendar-header-bar">
+          <div class="calendar-controls">
+            <button id="prevMonthBtn" class="btn btn-icon-round" title="이전 달">◀</button>
+            <h2 id="currentMonthYearDisplay" class="calendar-month-title">2026년 11월</h2>
+            <button id="nextMonthBtn" class="btn btn-icon-round" title="다음 달">▶</button>
+            <button id="todayBtn" class="btn btn-outline-primary btn-sm">오늘</button>
+          </div>
+          <div class="calendar-legend">
+            <span class="legend-item"><span class="legend-dot dot-exam"></span>시험/고사</span>
+            <span class="legend-item"><span class="legend-dot dot-assessment"></span>수행평가/과제</span>
+            <span class="legend-item"><span class="legend-dot dot-school"></span>학교행사</span>
+            <span class="legend-item"><span class="legend-dot dot-grade"></span>학년행사</span>
+            <span class="legend-item"><span class="legend-dot dot-class"></span>학급행사</span>
+            <span class="legend-item"><span class="legend-dot dot-holiday"></span>공휴/방학</span>
+          </div>
+        </div>
+
+        <div class="calendar-grid-container">
+          <div class="calendar-weekdays">
+            <div class="weekday sun">일</div>
+            <div class="weekday">월</div>
+            <div class="weekday">화</div>
+            <div class="weekday">수</div>
+            <div class="weekday">목</div>
+            <div class="weekday">금</div>
+            <div class="weekday sat">토</div>
+          </div>
+          <div id="calendarDaysGrid" class="calendar-days-grid">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- MAIN VIEW 2: List / Timeline View -->
+      <section id="listViewSection" class="view-section" style="display:none;">
+        <div class="list-controls-bar">
+          <span class="sort-info">총 <strong id="listEventCount">0</strong>건의 일정이 등록되어 있습니다.</span>
+          <div class="sort-options">
+            <label for="listSortSelect">정렬:</label>
+            <select id="listSortSelect" class="form-select-sm">
+              <option value="date-asc">날짜 오름차순 (가까운 순)</option>
+              <option value="date-desc">날짜 내림차순 (먼 날짜 순)</option>
+              <option value="title-asc">제목 가나다순</option>
+            </select>
+          </div>
+        </div>
+        <div id="eventsListContainer" class="events-timeline-container">
+          <!-- Populated via JavaScript -->
+        </div>
+      </section>
+
+      <!-- MAIN VIEW 3: Assessment Focus Board -->
+      <section id="assessmentViewSection" class="view-section" style="display:none;">
+        <div class="board-header-bar">
+          <div>
+            <h3>🎯 2026 수행평가 & 과제 집중 관리 보드</h3>
+            <p>과목별 평가 방법, 제출 기한, 준비물을 한눈에 체크하고 준비하세요.</p>
+          </div>
+          <div class="board-filter-stats">
+            <span class="chip chip-urgent">마감 임박 (<span id="urgentCount">0</span>)</span>
+            <span class="chip chip-active">진행 중 (<span id="activeCount">0</span>)</span>
+          </div>
+        </div>
+        <div id="assessmentCardsGrid" class="assessment-cards-grid">
+          <!-- Populated via JavaScript -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: Date Day Details Modal (When clicking a calendar cell) -->
+  <div id="dayDetailModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📅</span>
+          <div>
+            <h3 id="dayDetailModalDate">2026년 11월 16일 (월)</h3>
+            <p id="dayDetailModalSubtitle">해당 날짜의 상세 일정 목록</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="dayDetailModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="dayEventsDetailList" class="day-events-detail-list">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="addEventOnSelectedDateBtn" class="btn btn-primary btn-sm">
+          ➕ 이 날짜에 새 일정 등록
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" data-close-modal="dayDetailModal">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Event Detail & AI Guidance Modal -->
+  <div id="eventDetailModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span id="detailCategoryBadge" class="category-pill">수행평가</span>
+          <h3 id="detailEventTitle">일정 제목</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="eventDetailModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">📅 일정 기간</span>
+            <span id="detailPeriod" class="meta-val">2026.11.20 ~ 2026.11.20</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">🎯 적용 대상</span>
+            <span id="detailScope" class="meta-val">2학년 10반</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">⏰ 제출/마감 시각</span>
+            <span id="detailDueTime" class="meta-val">17:00까지</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">👤 등록자</span>
+            <span id="detailAuthor" class="meta-val">김선생님 (교사)</span>
+          </div>
+        </div>
+
+        <!-- Assessment Specific Detail Box -->
+        <div id="detailAssessmentBox" class="assessment-detail-box" style="display:none;">
+          <h4 class="box-title">📝 수행평가 상세 정보</h4>
+          <div class="meta-subgrid">
+            <div>
+              <strong>과목:</strong> <span id="detailSubject">인공지능 기초</span>
+            </div>
+            <div>
+              <strong>평가 방식:</strong> <span id="detailEvalMethod">개인 보고서 제출</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📄 상세 내용</h4>
+          <div id="detailDescription" class="detail-text-box">
+            내용이 표시됩니다.
+          </div>
+        </div>
+
+        <!-- Materials Checklist in Detail -->
+        <div class="detail-section">
+          <h4>🎒 챙겨야 할 준비물</h4>
+          <div id="detailMaterialsList" class="detail-materials-checklist">
+            <!-- Checkable items populated via JS -->
+          </div>
+        </div>
+
+        <!-- AI Preparation Guide Section -->
+        <div class="ai-recommendation-panel">
+          <div class="ai-panel-header">
+            <span>🤖 AI 스마트 학습 가이드</span>
+            <button id="generateAITipBtn" class="btn btn-ai-sm">💡 AI 준비 로드맵 확인</button>
+          </div>
+          <div id="aiTipContent" class="ai-tip-body">
+            AI 준비 로드맵 버튼을 누르면 이 수행평가를 효과적으로 준비하기 위한 D-Day 맞춤형 학습 조언을 보여줍니다.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="left-actions">
+          <button id="editEventBtn" class="btn btn-outline-primary btn-sm">✏️ 일정 수정</button>
+          <button id="deleteEventBtn" class="btn btn-outline-danger btn-sm">🗑️ 삭제</button>
+        </div>
+        <button class="btn btn-secondary btn-sm" data-close-modal="eventDetailModal">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add / Edit Event Form -->
+  <div id="eventFormModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">✏️</span>
+          <h3 id="formModalTitle">새 일정 등록</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="eventFormModal">✕</button>
+      </div>
+      <form id="eventForm" class="modal-body">
+        <input type="hidden" id="formEventId" value="">
+
+        <!-- Permission Notice Banner in Form -->
+        <div id="formPermissionBanner" class="form-notice-box">
+          <span class="notice-icon">ℹ️</span>
+          <span id="formPermissionText">현재 권한: 교사 (모든 범위 등록 가능)</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col flex-2">
+            <label for="formTitle" class="form-label required">일정 제목</label>
+            <input type="text" id="formTitle" class="form-control" placeholder="예: 인공지능 기초 수행평가 발표" required>
+          </div>
+          <div class="form-col flex-1">
+            <label for="formCategory" class="form-label required">일정 유형</label>
+            <select id="formCategory" class="form-select" required>
+              <option value="assessment">🟣 수행평가 / 과제</option>
+              <option value="exam">🔴 시험 (지필/모의고사)</option>
+              <option value="school_event">🟢 학교행사 (축제/입학/방학)</option>
+              <option value="grade_event">🟡 학년행사 (수련회/현장체험)</option>
+              <option value="class_event">🔵 학급행사 (단합/자치활동)</option>
+              <option value="holiday">⚪ 공휴일 / 재량휴업일</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Scope and Target Selection -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formScope" class="form-label required">적용 범위</label>
+            <select id="formScope" class="form-select" required>
+              <option value="school">🏫 학교 전체</option>
+              <option value="grade">🎓 특정 학년</option>
+              <option value="class" selected>👥 특정 반</option>
+            </select>
+          </div>
+          <div class="form-col" id="formGradeCol">
+            <label for="formTargetGrade" class="form-label">대상 학년</label>
+            <select id="formTargetGrade" class="form-select">
+              <option value="1">1학년</option>
+              <option value="2" selected>2학년</option>
+              <option value="3">3학년</option>
+            </select>
+          </div>
+          <div class="form-col" id="formClassCol">
+            <label for="formTargetClass" class="form-label">대상 반</label>
+            <select id="formTargetClass" class="form-select">
+              <option value="1">1반</option>
+              <option value="2">2반</option>
+              <option value="3">3반</option>
+              <option value="4">4반</option>
+              <option value="5">5반</option>
+              <option value="6">6반</option>
+              <option value="7">7반</option>
+              <option value="8">8반</option>
+              <option value="9">9반</option>
+              <option value="10" selected>10반</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Date and Time -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formStartDate" class="form-label required">시작 날짜</label>
+            <input type="date" id="formStartDate" class="form-control" required>
+          </div>
+          <div class="form-col">
+            <label for="formEndDate" class="form-label required">종료 날짜</label>
+            <input type="date" id="formEndDate" class="form-control" required>
+          </div>
+          <div class="form-col">
+            <label for="formDueTime" class="form-label">제출/시작 시간</label>
+            <input type="time" id="formDueTime" class="form-control" value="17:00">
+          </div>
+        </div>
+
+        <!-- Assessment Specific Extra Fields -->
+        <div id="formAssessmentFields" class="form-fieldset">
+          <div class="fieldset-header">
+            <span>📝 수행평가 / 과제 전용 정보</span>
+            <button type="button" id="aiSuggestAssessmentDetailsBtn" class="btn btn-ai-xs">
+              🤖 AI 자동 추천 채우기
+            </button>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label for="formSubject" class="form-label">과목명</label>
+              <input type="text" id="formSubject" class="form-control" placeholder="예: 인공지능 기초, 문학, 수학Ⅱ">
+            </div>
+            <div class="form-col">
+              <label for="formEvalMethod" class="form-label">평가 방법</label>
+              <input type="text" id="formEvalMethod" class="form-control" placeholder="예: 탐구 보고서 제출, 조별 발표, 포트폴리오">
+            </div>
+          </div>
+        </div>
+
+        <!-- Materials Checklist Input -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formMaterials" class="form-label">
+              준비물 <span class="label-helper">(쉼표로 구분하여 여러 개 입력)</span>
+            </label>
+            <input type="text" id="formMaterials" class="form-control" placeholder="예: 노트북, 필기도구, A4 보고서 양식지, 발표자료 USB">
+          </div>
+        </div>
+
+        <!-- Detailed Description -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formDescription" class="form-label">상세 내용 및 안내사항</label>
+            <textarea id="formDescription" class="form-control" rows="3" placeholder="일정 세부 내용, 평가 기준, 유의 사항 등을 자유롭게 입력하세요."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-close-modal="eventFormModal">취소</button>
+          <button type="submit" id="saveEventBtn" class="btn btn-primary">💾 저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

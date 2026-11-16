@@ -1,0 +1,4222 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>신성여고 AI 학교 일정 통합 관리 시스템 (School Life AI Planner)</title>
+  <style>
+/* ==========================================================================
+   신성여고 AI 학교 일정 통합 관리 시스템 (School Life AI Planner)
+   Style Sheet: Pastel Modern Student-Friendly Theme
+   ========================================================================== */
+
+/* --- 1. CSS Variables & Color Palette --- */
+:root {
+  /* Pastel Base Colors */
+  --bg-primary: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --bg-hover: #E2E8F0;
+
+  /* Brand Pastel Accents */
+  --primary: #6366F1;          /* Soft Indigo */
+  --primary-light: #EEF2FF;
+  --primary-hover: #4F46E5;
+  --primary-text: #4338CA;
+
+  /* Category Pastel Colors */
+  --cat-assessment-bg: #F3E8FF;  /* Pastel Purple */
+  --cat-assessment-border: #D8B4FE;
+  --cat-assessment-text: #7E22CE;
+  --cat-assessment-dot: #9333EA;
+
+  --cat-exam-bg: #FFE4E6;        /* Pastel Coral / Red */
+  --cat-exam-border: #FDA4AF;
+  --cat-exam-text: #BE123C;
+  --cat-exam-dot: #E11D48;
+
+  --cat-school-bg: #DCFCE7;      /* Pastel Mint / Green */
+  --cat-school-border: #86EFAC;
+  --cat-school-text: #15803D;
+  --cat-school-dot: #16A34A;
+
+  --cat-grade-bg: #FEF3C7;       /* Pastel Amber / Yellow */
+  --cat-grade-border: #FCD34D;
+  --cat-grade-text: #B45309;
+  --cat-grade-dot: #D97706;
+
+  --cat-class-bg: #E0F2FE;       /* Pastel Sky Blue */
+  --cat-class-border: #7DD3FC;
+  --cat-class-text: #0369A1;
+  --cat-class-dot: #0284C7;
+
+  --cat-holiday-bg: #F1F5F9;     /* Soft Gray */
+  --cat-holiday-border: #CBD5E1;
+  --cat-holiday-text: #475569;
+  --cat-holiday-dot: #64748B;
+
+  /* Neutrals & Text */
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
+  --border-light: #E2E8F0;
+  --border-focus: #818CF8;
+
+  /* UI Effects */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- 2. Reset & Global Styles --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: var(--transition);
+}
+
+/* --- 3. App Header --- */
+.app-header {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-container {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  font-size: 2rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+}
+
+.school-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.brand-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+/* Global Search Bar */
+.header-search {
+  flex: 1;
+  max-width: 380px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.header-search input {
+  width: 100%;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  background-color: var(--bg-subtle);
+  color: var(--text-main);
+  outline: none;
+  transition: var(--transition);
+}
+
+.header-search input:focus {
+  background-color: var(--bg-surface);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.85rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.clear-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+/* User Role & Add Button */
+.user-role-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.role-selector-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-subtle);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+}
+
+.role-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.role-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.role-dropdown {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+.role-dropdown:focus {
+  border-color: var(--primary);
+}
+
+.user-scope-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: #E0E7FF;
+  color: #3730A3;
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.35);
+}
+
+.btn-outline-primary {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-light);
+}
+
+.btn-outline-secondary {
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.btn-outline-danger {
+  border: 1px solid #FDA4AF;
+  color: #E11D48;
+  background: transparent;
+}
+
+.btn-outline-danger:hover {
+  background: #FFE4E6;
+}
+
+.btn-secondary {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+}
+
+.btn-icon-round {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.btn-icon-round:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.btn-text {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-text:hover {
+  background: var(--primary-light);
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* --- 4. Main Layout --- */
+.main-layout {
+  max-width: 1560px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* --- 5. Sidebar & Cards --- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.card-header {
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.card-header h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.card-body {
+  padding: 1rem 1.1rem;
+}
+
+/* AI Assistant Card */
+.ai-assistant-card {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border: 1px solid #DDD6FE;
+}
+
+.ai-header {
+  border-bottom: 1px solid #E9D5FF;
+}
+
+.ai-badge {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #6D28D9;
+}
+
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.ai-intro {
+  font-size: 0.8rem;
+  color: #5B21B6;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.ai-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ai-input-wrap textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #C4B5FD;
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  resize: vertical;
+  outline: none;
+}
+
+.ai-input-wrap textarea:focus {
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.btn-ai-action {
+  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+  color: #FFFFFF;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);
+}
+
+.btn-ai-action:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.ai-workload-alert {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.ai-alert-box {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem;
+  color: #92400E;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  line-height: 1.4;
+}
+
+/* Today & Upcoming Cards */
+.date-chip {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.badge-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #FFE4E6;
+  color: #BE123C;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.compact-event-list, .dday-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.compact-event-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border-left: 3px solid var(--primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.compact-event-item:hover {
+  background: var(--bg-hover);
+  transform: translateX(2px);
+}
+
+.compact-event-icon {
+  font-size: 1.1rem;
+}
+
+.compact-event-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-event-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-event-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* D-Day Card Item */
+.dday-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dday-card-item:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.dday-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.dday-urgent {
+  background: #FFE4E6;
+  color: #E11D48;
+  animation: pulse-urgent 1.5s infinite;
+}
+
+@keyframes pulse-urgent {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.dday-soon {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.dday-normal {
+  background: #EDE9FE;
+  color: #7C3AED;
+}
+
+/* Supplies Checklist */
+.checklist-progress-bar {
+  height: 6px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981, #059669);
+  transition: width 0.3s ease;
+}
+
+.checklist-status-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.checklist-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  font-size: 0.83rem;
+  transition: var(--transition);
+}
+
+.check-item:hover {
+  background: var(--bg-hover);
+}
+
+.check-item input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  width: 15px;
+  height: 15px;
+}
+
+.check-label {
+  flex: 1;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.check-label.completed {
+  text-decoration: line-through;
+  color: var(--text-light);
+}
+
+.check-event-tag {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.empty-state-text {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* --- 6. Content Area & Navigation Panel --- */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.navigation-panel {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Primary Scope Tabs */
+.scope-tabs-container {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.scope-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.scope-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.scope-tab:hover {
+  color: var(--text-main);
+  background: var(--bg-hover);
+}
+
+.scope-tab.active {
+  background: var(--primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+}
+
+.scope-tab .tab-icon {
+  font-size: 1.05rem;
+}
+
+/* Filter Toolbar */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.pill-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-subtle);
+  padding: 3px;
+  border-radius: var(--radius-full);
+}
+
+.pill-tab {
+  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.pill-tab.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-select-sm {
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+}
+
+/* Category Chips */
+.category-chips {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.cat-chip {
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+  transition: var(--transition);
+}
+
+.cat-chip:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.cat-chip.active {
+  background: #334155;
+  color: #FFFFFF;
+  border-color: #334155;
+}
+
+/* View Mode Toggle */
+.view-mode-toggle {
+  display: flex;
+  background: var(--bg-subtle);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  gap: 2px;
+  margin-left: auto;
+}
+
+.view-btn {
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.view-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Scope Banner */
+.scope-banner {
+  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  border: 1px solid #C7D2FE;
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.banner-icon {
+  font-size: 2.2rem;
+}
+
+.banner-texts h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #312E81;
+}
+
+.banner-texts p {
+  font-size: 0.85rem;
+  color: #4338CA;
+  margin-top: 2px;
+}
+
+.banner-stat {
+  text-align: right;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(199, 210, 254, 0.6);
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* --- 7. Monthly Calendar View --- */
+.view-section {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+}
+
+.calendar-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.calendar-month-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  min-width: 140px;
+  text-align: center;
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-exam { background-color: var(--cat-exam-dot); }
+.dot-assessment { background-color: var(--cat-assessment-dot); }
+.dot-school { background-color: var(--cat-school-dot); }
+.dot-grade { background-color: var(--cat-grade-dot); }
+.dot-class { background-color: var(--cat-class-dot); }
+.dot-holiday { background-color: var(--cat-holiday-dot); }
+
+/* Calendar Grid */
+.calendar-grid-container {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.weekday {
+  padding: 0.65rem 0.25rem;
+}
+
+.weekday.sun { color: #E11D48; }
+.weekday.sat { color: #2563EB; }
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(110px, auto);
+  background: var(--border-light);
+  gap: 1px;
+}
+
+.calendar-day-cell {
+  background: var(--bg-surface);
+  padding: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 110px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+
+.calendar-day-cell:hover {
+  background-color: #F8FAFC;
+}
+
+.calendar-day-cell.other-month {
+  background-color: #F8FAFC;
+  opacity: 0.45;
+}
+
+.calendar-day-cell.today {
+  background-color: #F5F3FF;
+}
+
+.calendar-day-cell.selected {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.day-number {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.calendar-day-cell.today .day-number {
+  background: var(--primary);
+  color: #FFFFFF;
+}
+
+.calendar-day-cell.sunday .day-number { color: #E11D48; }
+.calendar-day-cell.saturday .day-number { color: #2563EB; }
+
+.day-events-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+/* Event Chips in Calendar Cell */
+.event-chip {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border-left: 2.5px solid transparent;
+  transition: transform 0.1s ease;
+}
+
+.event-chip:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.95);
+}
+
+.event-chip.cat-assessment {
+  background: var(--cat-assessment-bg);
+  color: var(--cat-assessment-text);
+  border-left-color: var(--cat-assessment-dot);
+}
+
+.event-chip.cat-exam {
+  background: var(--cat-exam-bg);
+  color: var(--cat-exam-text);
+  border-left-color: var(--cat-exam-dot);
+}
+
+.event-chip.cat-school_event {
+  background: var(--cat-school-bg);
+  color: var(--cat-school-text);
+  border-left-color: var(--cat-school-dot);
+}
+
+.event-chip.cat-grade_event {
+  background: var(--cat-grade-bg);
+  color: var(--cat-grade-text);
+  border-left-color: var(--cat-grade-dot);
+}
+
+.event-chip.cat-class_event {
+  background: var(--cat-class-bg);
+  color: var(--cat-class-text);
+  border-left-color: var(--cat-class-dot);
+}
+
+.event-chip.cat-holiday {
+  background: var(--cat-holiday-bg);
+  color: var(--cat-holiday-text);
+  border-left-color: var(--cat-holiday-dot);
+}
+
+.more-events-chip {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 1px 4px;
+}
+
+/* --- 8. List & Timeline View --- */
+.list-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sort-info {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.events-timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.timeline-event-card {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  gap: 1.25rem;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.timeline-event-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.timeline-date-col {
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-right: 1px dashed var(--border-light);
+  padding-right: 1.25rem;
+}
+
+.timeline-date-day {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+}
+
+.timeline-date-ym {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.timeline-content-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.timeline-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.category-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.category-pill.assessment { background: var(--cat-assessment-bg); color: var(--cat-assessment-text); }
+.category-pill.exam { background: var(--cat-exam-bg); color: var(--cat-exam-text); }
+.category-pill.school_event { background: var(--cat-school-bg); color: var(--cat-school-text); }
+.category-pill.grade_event { background: var(--cat-grade-bg); color: var(--cat-grade-text); }
+.category-pill.class_event { background: var(--cat-class-bg); color: var(--cat-class-text); }
+.category-pill.holiday { background: var(--cat-holiday-bg); color: var(--cat-holiday-text); }
+
+.scope-pill {
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+}
+
+.timeline-event-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.timeline-event-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.timeline-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.materials-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.mat-tag {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* --- 9. Assessment Kanban Board View --- */
+.board-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.board-header-bar h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.board-header-bar p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.board-filter-stats {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chip {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.chip-urgent { background: #FFE4E6; color: #BE123C; }
+.chip-active { background: #EDE9FE; color: #6D28D9; }
+
+.assessment-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.assessment-card {
+  background: var(--bg-surface);
+  border: 1px solid #DDD6FE;
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  transition: var(--transition);
+}
+
+.assessment-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #8B5CF6;
+  transform: translateY(-2px);
+}
+
+.as-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.as-subject-badge {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #6D28D9;
+  background: #F3E8FF;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.as-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.as-card-info {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.as-info-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.as-info-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.as-info-value {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.as-supplies-preview {
+  font-size: 0.78rem;
+}
+
+.as-supplies-title {
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.as-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-light);
+}
+
+/* --- 10. Modals --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-dialog {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-md { max-width: 540px; }
+.modal-lg { max-width: 680px; }
+
+.modal-header {
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.modal-icon {
+  font-size: 1.3rem;
+}
+
+.modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.modal-header p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.modal-close-btn {
+  font-size: 1.1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 1.25rem 1.4rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-footer {
+  padding: 0.9rem 1.4rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  background: var(--bg-subtle);
+}
+
+.modal-footer .left-actions {
+  margin-right: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Form Styles */
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-col {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-col.flex-2 { flex: 2; }
+.form-col.flex-1 { flex: 1; }
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.form-label.required::after {
+  content: " *";
+  color: #E11D48;
+}
+
+.label-helper {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: var(--text-muted);
+}
+
+.form-control, .form-select {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.form-notice-box {
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  color: #3730A3;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-fieldset {
+  background: #FAF5FF;
+  border: 1px solid #E9D5FF;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fieldset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7E22CE;
+}
+
+.btn-ai-xs {
+  background: #9333EA;
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.btn-ai-xs:hover {
+  background: #7E22CE;
+}
+
+/* Detail Modal Inner Elements */
+.detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  background: var(--bg-subtle);
+  padding: 0.85rem;
+  border-radius: var(--radius-sm);
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.meta-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.assessment-detail-box {
+  background: #FAF5FF;
+  border: 1px solid #E9D5FF;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+}
+
+.box-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #7E22CE;
+  margin-bottom: 0.4rem;
+}
+
+.meta-subgrid {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.detail-section h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.detail-text-box {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.detail-materials-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ai-recommendation-panel {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border: 1px solid #C4B5FD;
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+}
+
+.ai-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #6D28D9;
+  margin-bottom: 0.5rem;
+}
+
+.btn-ai-sm {
+  background: #7C3AED;
+  color: #FFFFFF;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.btn-ai-sm:hover {
+  background: #6D28D9;
+}
+
+.ai-tip-body {
+  font-size: 0.83rem;
+  color: #4C1D95;
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Day Detail Modal List */
+.day-events-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+/* --- 11. Toast Notifications --- */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background: #1E293B;
+  color: #FFFFFF;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: slideInRight 0.25s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+}
+
+.toast.toast-success { border-left: 4px solid #10B981; }
+.toast.toast-warning { border-left: 4px solid #F59E0B; }
+.toast.toast-error { border-left: 4px solid #EF4444; }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
+
+/* --- 12. Responsive Design (Mobile / Tablet) --- */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    order: 2;
+  }
+  .content-area {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .header-search {
+    max-width: 100%;
+  }
+  .user-role-section {
+    justify-content: space-between;
+  }
+  .filter-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .view-mode-toggle {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+  .calendar-days-grid {
+    grid-auto-rows: minmax(75px, auto);
+  }
+  .calendar-day-cell {
+    min-height: 75px;
+    padding: 0.25rem;
+  }
+  .event-chip {
+    font-size: 0.65rem;
+    padding: 1px 3px;
+  }
+  .timeline-event-card {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .timeline-date-col {
+    border-right: none;
+    border-bottom: 1px dashed var(--border-light);
+    padding-right: 0;
+    padding-bottom: 0.5rem;
+    align-items: flex-start;
+  }
+  .modal-dialog {
+    max-height: 95vh;
+  }
+}
+
+
+</style>
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">🏫</div>
+        <div class="brand-text">
+          <span class="school-badge">신성여자고등학교</span>
+          <h1 class="brand-title">AI 스마트 학교 일정 플래너</h1>
+        </div>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="header-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearchInput" placeholder="일정, 과목, 준비물 검색..." autocomplete="off">
+        <button id="clearSearchBtn" class="clear-btn" style="display:none;">✕</button>
+      </div>
+
+      <!-- User Role Switcher -->
+      <div class="user-role-section">
+        <div class="role-selector-card">
+          <label for="userRoleSelect" class="role-label">현재 사용자 모드:</label>
+          <div class="role-controls">
+            <select id="userRoleSelect" class="role-dropdown">
+              <option value="teacher">🧑‍🏫 교사 (학사관리자: 전체 권한)</option>
+              <option value="president" selected>👑 반장 (2학년 10반 반장: 학급 권한)</option>
+              <option value="student">🎒 학생 (2학년 10반 학생: 조회/체크)</option>
+            </select>
+            <div id="userScopeInfo" class="user-scope-badge">2학년 10반</div>
+          </div>
+        </div>
+        <button id="openNewEventBtn" class="btn btn-primary btn-add-event">
+          <span class="btn-icon">➕</span> 새 일정 등록
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-layout">
+    <!-- Sidebar / Quick Dashboards -->
+    <aside class="sidebar">
+      <!-- AI Smart Assistant Card -->
+      <section class="card ai-assistant-card">
+        <div class="card-header ai-header">
+          <div class="ai-badge">🤖 AI 스마트 도우미</div>
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="card-body">
+          <p class="ai-intro">자연어로 일정을 말하면 AI가 스스로 항목을 분석해 입력 폼을 채워줍니다.</p>
+          <div class="ai-input-wrap">
+            <textarea id="aiQuickInput" placeholder="예: 다음주 금요일 2학년 10반 인공지능 기초 수행평가 발표, 준비물 노트북" rows="2"></textarea>
+            <button id="aiParseBtn" class="btn btn-ai-action">
+              <span>⚡ AI 일정 자동 완성</span>
+            </button>
+          </div>
+          <div id="aiWorkloadAlert" class="ai-workload-alert">
+            <!-- Dynamically populated AI workload/conflict warning -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Today's Briefing -->
+      <section class="card today-card">
+        <div class="card-header">
+          <h3>📌 오늘의 학사 브리핑</h3>
+          <span id="currentDateDisplay" class="date-chip">2026.11.16</span>
+        </div>
+        <div class="card-body">
+          <div id="todayEventsList" class="compact-event-list">
+            <!-- Dynamically populated today's events -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Upcoming Assessments (D-Day) -->
+      <section class="card upcoming-card">
+        <div class="card-header">
+          <h3>⏳ 다가오는 수행평가 & 시험</h3>
+          <span class="badge-count" id="upcomingCount">3</span>
+        </div>
+        <div class="card-body">
+          <div id="upcomingAssessmentList" class="dday-event-list">
+            <!-- Dynamically populated upcoming assessments -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Student Supplies Checklist -->
+      <section class="card checklist-card">
+        <div class="card-header">
+          <h3>🎒 나의 준비물 체크리스트</h3>
+          <button id="clearCompletedChecksBtn" class="btn-text">완료 정리</button>
+        </div>
+        <div class="card-body">
+          <div class="checklist-progress-bar">
+            <div id="checklistProgressFill" class="progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="checklist-status-text">
+            <span id="checklistStats">0 / 0 항목 준비 완료</span>
+            <span id="checklistPercent">0%</span>
+          </div>
+          <div id="suppliesChecklistContainer" class="checklist-items">
+            <!-- Dynamically populated supplies items -->
+          </div>
+        </div>
+      </section>
+
+      <!-- System Utility Actions -->
+      <div class="sidebar-footer">
+        <button id="resetDemoDataBtn" class="btn btn-outline-secondary btn-sm w-full">
+          🔄 기본 예시 데이터로 초기화
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="content-area">
+      <!-- Navigation Tabs: Scope & Grade/Class Filter -->
+      <div class="navigation-panel">
+        <div class="scope-tabs-container">
+          <div class="scope-tabs" role="tablist">
+            <button class="scope-tab active" data-scope="school">
+              <span class="tab-icon">🏫</span> 학교 전체 일정
+            </button>
+            <button class="scope-tab" data-scope="grade">
+              <span class="tab-icon">🎓</span> 학년별 일정
+            </button>
+            <button class="scope-tab" data-scope="class">
+              <span class="tab-icon">👥</span> 반별 일정 (수행평가/과제)
+            </button>
+            <button class="scope-tab" data-scope="my">
+              <span class="tab-icon">⭐</span> 내 맞춤 일정 모아보기
+            </button>
+          </div>
+        </div>
+
+        <!-- Grade & Class Secondary Filter Bar -->
+        <div class="filter-toolbar">
+          <!-- Grade Selector (Visible in Grade & Class tabs) -->
+          <div id="gradeFilterGroup" class="filter-group" style="display:none;">
+            <span class="filter-label">학년 선택:</span>
+            <div class="pill-tabs" id="gradePillTabs">
+              <button class="pill-tab" data-grade="1">1학년</button>
+              <button class="pill-tab active" data-grade="2">2학년</button>
+              <button class="pill-tab" data-grade="3">3학년</button>
+            </div>
+          </div>
+
+          <!-- Class Selector (Visible in Class tab) -->
+          <div id="classFilterGroup" class="filter-group" style="display:none;">
+            <span class="filter-label">반 선택:</span>
+            <select id="classSelectDropdown" class="form-select-sm">
+              <option value="1">1반</option>
+              <option value="2">2반</option>
+              <option value="3">3반</option>
+              <option value="4">4반</option>
+              <option value="5">5반</option>
+              <option value="6">6반</option>
+              <option value="7">7반</option>
+              <option value="8">8반</option>
+              <option value="9">9반</option>
+              <option value="10" selected>10반</option>
+            </select>
+          </div>
+
+          <!-- Category Chips Filter -->
+          <div class="filter-group category-filter-group">
+            <span class="filter-label">유형 필터:</span>
+            <div class="category-chips" id="categoryChips">
+              <button class="cat-chip active" data-cat="all">전체</button>
+              <button class="cat-chip" data-cat="assessment">🟣 수행평가/과제</button>
+              <button class="cat-chip" data-cat="exam">🔴 지필평가/모의고사</button>
+              <button class="cat-chip" data-cat="school_event">🟢 학교행사</button>
+              <button class="cat-chip" data-cat="grade_event">🟡 학년행사</button>
+              <button class="cat-chip" data-cat="class_event">🔵 학급행사</button>
+            </div>
+          </div>
+
+          <!-- View Mode Toggle (Calendar vs List vs Assessment Kanban) -->
+          <div class="view-mode-toggle">
+            <button class="view-btn active" id="viewCalendarBtn" title="달력 뷰">
+              📅 달력
+            </button>
+            <button class="view-btn" id="viewListBtn" title="목록 뷰">
+              📑 목록
+            </button>
+            <button class="view-btn" id="viewAssessmentBtn" title="수행평가 집중 보드">
+              🎯 수행평가 보드
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scope Description Banner -->
+      <div id="scopeBanner" class="scope-banner">
+        <div class="banner-content">
+          <span class="banner-icon">🏫</span>
+          <div class="banner-texts">
+            <h2 id="scopeBannerTitle">학교 전체 일정</h2>
+            <p id="scopeBannerSubtitle">개학식, 방학식, 정기고사, 교내 축제 등 전교생 대상의 주요 학사일정입니다.</p>
+          </div>
+        </div>
+        <div class="banner-stat">
+          <span class="stat-number" id="currentViewEventCount">0</span>
+          <span class="stat-label">개 일정 표시 중</span>
+        </div>
+      </div>
+
+      <!-- MAIN VIEW 1: Monthly Calendar -->
+      <section id="calendarViewSection" class="view-section active">
+        <div class="calendar-header-bar">
+          <div class="calendar-controls">
+            <button id="prevMonthBtn" class="btn btn-icon-round" title="이전 달">◀</button>
+            <h2 id="currentMonthYearDisplay" class="calendar-month-title">2026년 11월</h2>
+            <button id="nextMonthBtn" class="btn btn-icon-round" title="다음 달">▶</button>
+            <button id="todayBtn" class="btn btn-outline-primary btn-sm">오늘</button>
+          </div>
+          <div class="calendar-legend">
+            <span class="legend-item"><span class="legend-dot dot-exam"></span>시험/고사</span>
+            <span class="legend-item"><span class="legend-dot dot-assessment"></span>수행평가/과제</span>
+            <span class="legend-item"><span class="legend-dot dot-school"></span>학교행사</span>
+            <span class="legend-item"><span class="legend-dot dot-grade"></span>학년행사</span>
+            <span class="legend-item"><span class="legend-dot dot-class"></span>학급행사</span>
+            <span class="legend-item"><span class="legend-dot dot-holiday"></span>공휴/방학</span>
+          </div>
+        </div>
+
+        <div class="calendar-grid-container">
+          <div class="calendar-weekdays">
+            <div class="weekday sun">일</div>
+            <div class="weekday">월</div>
+            <div class="weekday">화</div>
+            <div class="weekday">수</div>
+            <div class="weekday">목</div>
+            <div class="weekday">금</div>
+            <div class="weekday sat">토</div>
+          </div>
+          <div id="calendarDaysGrid" class="calendar-days-grid">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- MAIN VIEW 2: List / Timeline View -->
+      <section id="listViewSection" class="view-section" style="display:none;">
+        <div class="list-controls-bar">
+          <span class="sort-info">총 <strong id="listEventCount">0</strong>건의 일정이 등록되어 있습니다.</span>
+          <div class="sort-options">
+            <label for="listSortSelect">정렬:</label>
+            <select id="listSortSelect" class="form-select-sm">
+              <option value="date-asc">날짜 오름차순 (가까운 순)</option>
+              <option value="date-desc">날짜 내림차순 (먼 날짜 순)</option>
+              <option value="title-asc">제목 가나다순</option>
+            </select>
+          </div>
+        </div>
+        <div id="eventsListContainer" class="events-timeline-container">
+          <!-- Populated via JavaScript -->
+        </div>
+      </section>
+
+      <!-- MAIN VIEW 3: Assessment Focus Board -->
+      <section id="assessmentViewSection" class="view-section" style="display:none;">
+        <div class="board-header-bar">
+          <div>
+            <h3>🎯 2026 수행평가 & 과제 집중 관리 보드</h3>
+            <p>과목별 평가 방법, 제출 기한, 준비물을 한눈에 체크하고 준비하세요.</p>
+          </div>
+          <div class="board-filter-stats">
+            <span class="chip chip-urgent">마감 임박 (<span id="urgentCount">0</span>)</span>
+            <span class="chip chip-active">진행 중 (<span id="activeCount">0</span>)</span>
+          </div>
+        </div>
+        <div id="assessmentCardsGrid" class="assessment-cards-grid">
+          <!-- Populated via JavaScript -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: Date Day Details Modal (When clicking a calendar cell) -->
+  <div id="dayDetailModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📅</span>
+          <div>
+            <h3 id="dayDetailModalDate">2026년 11월 16일 (월)</h3>
+            <p id="dayDetailModalSubtitle">해당 날짜의 상세 일정 목록</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="dayDetailModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="dayEventsDetailList" class="day-events-detail-list">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="addEventOnSelectedDateBtn" class="btn btn-primary btn-sm">
+          ➕ 이 날짜에 새 일정 등록
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" data-close-modal="dayDetailModal">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Event Detail & AI Guidance Modal -->
+  <div id="eventDetailModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span id="detailCategoryBadge" class="category-pill">수행평가</span>
+          <h3 id="detailEventTitle">일정 제목</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="eventDetailModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">📅 일정 기간</span>
+            <span id="detailPeriod" class="meta-val">2026.11.20 ~ 2026.11.20</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">🎯 적용 대상</span>
+            <span id="detailScope" class="meta-val">2학년 10반</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">⏰ 제출/마감 시각</span>
+            <span id="detailDueTime" class="meta-val">17:00까지</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">👤 등록자</span>
+            <span id="detailAuthor" class="meta-val">김선생님 (교사)</span>
+          </div>
+        </div>
+
+        <!-- Assessment Specific Detail Box -->
+        <div id="detailAssessmentBox" class="assessment-detail-box" style="display:none;">
+          <h4 class="box-title">📝 수행평가 상세 정보</h4>
+          <div class="meta-subgrid">
+            <div>
+              <strong>과목:</strong> <span id="detailSubject">인공지능 기초</span>
+            </div>
+            <div>
+              <strong>평가 방식:</strong> <span id="detailEvalMethod">개인 보고서 제출</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>📄 상세 내용</h4>
+          <div id="detailDescription" class="detail-text-box">
+            내용이 표시됩니다.
+          </div>
+        </div>
+
+        <!-- Materials Checklist in Detail -->
+        <div class="detail-section">
+          <h4>🎒 챙겨야 할 준비물</h4>
+          <div id="detailMaterialsList" class="detail-materials-checklist">
+            <!-- Checkable items populated via JS -->
+          </div>
+        </div>
+
+        <!-- AI Preparation Guide Section -->
+        <div class="ai-recommendation-panel">
+          <div class="ai-panel-header">
+            <span>🤖 AI 스마트 학습 가이드</span>
+            <button id="generateAITipBtn" class="btn btn-ai-sm">💡 AI 준비 로드맵 확인</button>
+          </div>
+          <div id="aiTipContent" class="ai-tip-body">
+            AI 준비 로드맵 버튼을 누르면 이 수행평가를 효과적으로 준비하기 위한 D-Day 맞춤형 학습 조언을 보여줍니다.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="left-actions">
+          <button id="editEventBtn" class="btn btn-outline-primary btn-sm">✏️ 일정 수정</button>
+          <button id="deleteEventBtn" class="btn btn-outline-danger btn-sm">🗑️ 삭제</button>
+        </div>
+        <button class="btn btn-secondary btn-sm" data-close-modal="eventDetailModal">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add / Edit Event Form -->
+  <div id="eventFormModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">✏️</span>
+          <h3 id="formModalTitle">새 일정 등록</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="eventFormModal">✕</button>
+      </div>
+      <form id="eventForm" class="modal-body">
+        <input type="hidden" id="formEventId" value="">
+
+        <!-- Permission Notice Banner in Form -->
+        <div id="formPermissionBanner" class="form-notice-box">
+          <span class="notice-icon">ℹ️</span>
+          <span id="formPermissionText">현재 권한: 교사 (모든 범위 등록 가능)</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col flex-2">
+            <label for="formTitle" class="form-label required">일정 제목</label>
+            <input type="text" id="formTitle" class="form-control" placeholder="예: 인공지능 기초 수행평가 발표" required>
+          </div>
+          <div class="form-col flex-1">
+            <label for="formCategory" class="form-label required">일정 유형</label>
+            <select id="formCategory" class="form-select" required>
+              <option value="assessment">🟣 수행평가 / 과제</option>
+              <option value="exam">🔴 시험 (지필/모의고사)</option>
+              <option value="school_event">🟢 학교행사 (축제/입학/방학)</option>
+              <option value="grade_event">🟡 학년행사 (수련회/현장체험)</option>
+              <option value="class_event">🔵 학급행사 (단합/자치활동)</option>
+              <option value="holiday">⚪ 공휴일 / 재량휴업일</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Scope and Target Selection -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formScope" class="form-label required">적용 범위</label>
+            <select id="formScope" class="form-select" required>
+              <option value="school">🏫 학교 전체</option>
+              <option value="grade">🎓 특정 학년</option>
+              <option value="class" selected>👥 특정 반</option>
+            </select>
+          </div>
+          <div class="form-col" id="formGradeCol">
+            <label for="formTargetGrade" class="form-label">대상 학년</label>
+            <select id="formTargetGrade" class="form-select">
+              <option value="1">1학년</option>
+              <option value="2" selected>2학년</option>
+              <option value="3">3학년</option>
+            </select>
+          </div>
+          <div class="form-col" id="formClassCol">
+            <label for="formTargetClass" class="form-label">대상 반</label>
+            <select id="formTargetClass" class="form-select">
+              <option value="1">1반</option>
+              <option value="2">2반</option>
+              <option value="3">3반</option>
+              <option value="4">4반</option>
+              <option value="5">5반</option>
+              <option value="6">6반</option>
+              <option value="7">7반</option>
+              <option value="8">8반</option>
+              <option value="9">9반</option>
+              <option value="10" selected>10반</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Date and Time -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formStartDate" class="form-label required">시작 날짜</label>
+            <input type="date" id="formStartDate" class="form-control" required>
+          </div>
+          <div class="form-col">
+            <label for="formEndDate" class="form-label required">종료 날짜</label>
+            <input type="date" id="formEndDate" class="form-control" required>
+          </div>
+          <div class="form-col">
+            <label for="formDueTime" class="form-label">제출/시작 시간</label>
+            <input type="time" id="formDueTime" class="form-control" value="17:00">
+          </div>
+        </div>
+
+        <!-- Assessment Specific Extra Fields -->
+        <div id="formAssessmentFields" class="form-fieldset">
+          <div class="fieldset-header">
+            <span>📝 수행평가 / 과제 전용 정보</span>
+            <button type="button" id="aiSuggestAssessmentDetailsBtn" class="btn btn-ai-xs">
+              🤖 AI 자동 추천 채우기
+            </button>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label for="formSubject" class="form-label">과목명</label>
+              <input type="text" id="formSubject" class="form-control" placeholder="예: 인공지능 기초, 문학, 수학Ⅱ">
+            </div>
+            <div class="form-col">
+              <label for="formEvalMethod" class="form-label">평가 방법</label>
+              <input type="text" id="formEvalMethod" class="form-control" placeholder="예: 탐구 보고서 제출, 조별 발표, 포트폴리오">
+            </div>
+          </div>
+        </div>
+
+        <!-- Materials Checklist Input -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formMaterials" class="form-label">
+              준비물 <span class="label-helper">(쉼표로 구분하여 여러 개 입력)</span>
+            </label>
+            <input type="text" id="formMaterials" class="form-control" placeholder="예: 노트북, 필기도구, A4 보고서 양식지, 발표자료 USB">
+          </div>
+        </div>
+
+        <!-- Detailed Description -->
+        <div class="form-row">
+          <div class="form-col">
+            <label for="formDescription" class="form-label">상세 내용 및 안내사항</label>
+            <textarea id="formDescription" class="form-control" rows="3" placeholder="일정 세부 내용, 평가 기준, 유의 사항 등을 자유롭게 입력하세요."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-close-modal="eventFormModal">취소</button>
+          <button type="submit" id="saveEventBtn" class="btn btn-primary">💾 저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script>
+/**
+ * ==============================================================================
+ * 신성여자고등학교 AI 학교 일정 통합 관리 시스템 (School Life AI Planner)
+ * Core Application Logic & State Engine
+ * ==============================================================================
+ */
+
+// --- 1. Global State & Constants ---
+const APP_STORAGE_KEY = 'shinseong_school_events_v1';
+const CHECKLIST_STORAGE_KEY = 'shinseong_supplies_checks_v1';
+const USER_STORAGE_KEY = 'shinseong_user_session_v1';
+
+// Base system date for simulation: 2026-11-16 (Monday)
+const TODAY_STR = '2026-11-16';
+const TODAY_DATE = new Date(2026, 10, 16); // month is 0-indexed (10 = November)
+
+// App State
+let state = {
+  events: [],
+  currentUser: {
+    role: 'president', // 'teacher' | 'president' | 'student'
+    grade: 2,
+    classNum: 10,
+    name: '김신성'
+  },
+  activeScope: 'school', // 'school' | 'grade' | 'class' | 'my'
+  selectedGrade: 2,
+  selectedClass: 10,
+  activeCategory: 'all',
+  activeView: 'calendar', // 'calendar' | 'list' | 'assessment'
+  currentCalYear: 2026,
+  currentCalMonth: 10, // 0-indexed: 10 = November
+  searchQuery: '',
+  selectedDate: TODAY_STR,
+  suppliesChecks: {} // { [key]: boolean }
+};
+
+// Initial Mock Dataset (2026 Sungshin Girls' High School Realistic Calendar)
+const DEFAULT_EVENTS = [
+  // --- 1. 학교 전체 일정 (School Scope) ---
+  {
+    id: 'evt-s-001',
+    title: '2026학년도 대학수학능력시험일 (전교생 휴업)',
+    category: 'holiday',
+    scope: 'school',
+    targetGrade: null,
+    targetClass: null,
+    startDate: '2026-11-19',
+    endDate: '2026-11-19',
+    dueTime: '08:00',
+    subject: '',
+    evalMethod: '',
+    materials: ['수험표', '신분증', '도시락'],
+    description: '2026학년도 수능 당일 고사장 운영으로 인해 1, 2학년은 재량휴업일이며 등교하지 않습니다.',
+    authorRole: 'teacher',
+    authorName: '교무부'
+  },
+  {
+    id: 'evt-s-002',
+    title: '신성여자고등학교 개교기념일',
+    category: 'holiday',
+    scope: 'school',
+    targetGrade: null,
+    targetClass: null,
+    startDate: '2026-11-27',
+    endDate: '2026-11-27',
+    dueTime: '',
+    subject: '',
+    evalMethod: '',
+    materials: [],
+    description: '개교기념일 행사 및 학교 공식 휴업일입니다.',
+    authorRole: 'teacher',
+    authorName: '교무부'
+  },
+  {
+    id: 'evt-s-003',
+    title: '2학기 2차 지필평가 (기말고사)',
+    category: 'exam',
+    scope: 'school',
+    targetGrade: null,
+    targetClass: null,
+    startDate: '2026-12-14',
+    endDate: '2026-12-18',
+    dueTime: '09:00',
+    subject: '전 과목',
+    evalMethod: '지필평가 (선다형 및 서답형)',
+    materials: ['컴퓨터용 사인펜', '수정테이프', '신분증/학생증', '지우개'],
+    description: '2026학년도 2학기 전교생 기말고사 기간입니다. 시험 시간표는 추후 공지됩니다.',
+    authorRole: 'teacher',
+    authorName: '교무연구부'
+  },
+  {
+    id: 'evt-s-004',
+    title: '2026 신성 난향제 (동아리 축제)',
+    category: 'school_event',
+    scope: 'school',
+    targetGrade: null,
+    targetClass: null,
+    startDate: '2026-12-24',
+    endDate: '2026-12-24',
+    dueTime: '13:00',
+    subject: '',
+    evalMethod: '',
+    materials: ['동아리 부스 준비물', '동아리 팜플렛'],
+    description: '교내 동아리별 부스 운영 및 강당 공연이 진행되는 연례 교내 축제입니다.',
+    authorRole: 'teacher',
+    authorName: '학생자치부'
+  },
+  {
+    id: 'evt-s-005',
+    title: '2026학년도 2학기 겨울방학식',
+    category: 'school_event',
+    scope: 'school',
+    targetGrade: null,
+    targetClass: null,
+    startDate: '2026-12-31',
+    endDate: '2026-12-31',
+    dueTime: '11:00',
+    subject: '',
+    evalMethod: '',
+    materials: ['가정통신문', '통지표 수령용 가방'],
+    description: '종업식 및 겨울방학식이 4교시 후 진행됩니다. 급식 후 안전 귀가합니다.',
+    authorRole: 'teacher',
+    authorName: '교무부'
+  },
+
+  // --- 2. 학년별 일정 (Grade Scope) ---
+  {
+    id: 'evt-g1-001',
+    title: '1학년 진로 탐색의 날 및 선배 멘토링',
+    category: 'grade_event',
+    scope: 'grade',
+    targetGrade: 1,
+    targetClass: null,
+    startDate: '2026-11-25',
+    endDate: '2026-11-25',
+    dueTime: '13:30',
+    subject: '진로와 직업',
+    evalMethod: '',
+    materials: ['진로 워크북', '필기도구'],
+    description: '졸업생 선배 및 전문 직업인 초청 멘토링 특강이 각 반에서 진행됩니다.',
+    authorRole: 'teacher',
+    authorName: '1학년부'
+  },
+  {
+    id: 'evt-g2-001',
+    title: '2학년 전국연합학력평가 (모의고사)',
+    category: 'exam',
+    scope: 'grade',
+    targetGrade: 2,
+    targetClass: null,
+    startDate: '2026-11-26',
+    endDate: '2026-11-26',
+    dueTime: '08:40',
+    subject: '국어, 수학, 영어, 한국사, 탐구',
+    evalMethod: '수능형 지필평가',
+    materials: ['컴퓨터용 사인펜', '수정테이프', '샤프/지우개', '아날로그 손목시계'],
+    description: '경기도교육청 주관 2학년 전국연합학력평가 실시. 8시 10분까지 입실 완료해야 합니다.',
+    authorRole: 'teacher',
+    authorName: '2학년부'
+  },
+  {
+    id: 'evt-g2-002',
+    title: '2학년 전공 탐색 학술발표대회',
+    category: 'grade_event',
+    scope: 'grade',
+    targetGrade: 2,
+    targetClass: null,
+    startDate: '2026-12-04',
+    endDate: '2026-12-04',
+    dueTime: '15:30',
+    subject: '진로 탐구',
+    evalMethod: 'PPT 발표 및 포스터 세션',
+    materials: ['발표 슬라이드 USB', '요약 발표지 10부'],
+    description: '희망 전공별 소논문 및 연구 보고서 본선 진출자 발표대회입니다.',
+    authorRole: 'teacher',
+    authorName: '2학년부'
+  },
+  {
+    id: 'evt-g3-001',
+    title: '3학년 수능 후 진로 전환기 프로그램 (금융/법률 특강)',
+    category: 'grade_event',
+    scope: 'grade',
+    targetGrade: 3,
+    targetClass: null,
+    startDate: '2026-11-23',
+    endDate: '2026-11-23',
+    dueTime: '10:00',
+    subject: '',
+    evalMethod: '',
+    materials: ['필기도구'],
+    description: '사회 진출을 앞둔 3학년 대상 실생활 금융 상식 및 근로기준법 특강입니다.',
+    authorRole: 'teacher',
+    authorName: '3학년부'
+  },
+
+  // --- 3. 반별 일정 (Class Scope: 2학년 10반 중심) ---
+  {
+    id: 'evt-c10-001',
+    title: '인공지능 기초 수행평가 - AI 윤리 및 지도학습 알고리즘 보고서 제출',
+    category: 'assessment',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 10,
+    startDate: '2026-11-20',
+    endDate: '2026-11-20',
+    dueTime: '17:00',
+    subject: '인공지능 기초',
+    evalMethod: '개인 탐구 보고서 제출 (A4 3매, PDF 제출)',
+    materials: ['노트북', '참고 논문 요약본', '보고서 양식지'],
+    description: '교과서에서 다룬 지도학습(로지스틱 회귀, 분류) 원리와 인공지능 윤리적 딜레마 사례를 분석하여 학교 포털에 제출합니다.',
+    authorRole: 'teacher',
+    authorName: '김정보 교사'
+  },
+  {
+    id: 'evt-c10-002',
+    title: '문학 수행평가 - 현대시 감상 비평문 서술형 작성',
+    category: 'assessment',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 10,
+    startDate: '2026-11-24',
+    endDate: '2026-11-24',
+    dueTime: '10:30',
+    subject: '문학',
+    evalMethod: '교실 내 현장 서술형 평가 (2교시)',
+    materials: ['검은색 볼펜', '문학 교과서', '학습지철'],
+    description: '수업 시간에 배운 일제강점기 저항시 중 한 편을 선택하여 시적 이미지와 화자의 정서를 논리적으로 비평합니다.',
+    authorRole: 'teacher',
+    authorName: '이문학 교사'
+  },
+  {
+    id: 'evt-c10-003',
+    title: '수학Ⅱ 수행평가 - 함수의 연속과 미분가능성 탐구 보고서',
+    category: 'assessment',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 10,
+    startDate: '2026-12-01',
+    endDate: '2026-12-01',
+    dueTime: '13:00',
+    subject: '수학Ⅱ',
+    evalMethod: '실생활 문제 해결 탐구 서술형 (4교시)',
+    materials: ['공학용 계산기', '삼각자/직선자', '샤프'],
+    description: '평균변화율과 순간변화율의 실생활 적용 사례(차량 속도 측정기, 고속열차 가속도)를 수학적으로 모델링하여 서술합니다.',
+    authorRole: 'teacher',
+    authorName: '박수학 교사'
+  },
+  {
+    id: 'evt-c10-004',
+    title: '영어Ⅰ 5단원 핵심 어휘 쪽지시험',
+    category: 'exam',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 10,
+    startDate: '2026-11-16',
+    endDate: '2026-11-16',
+    dueTime: '09:00',
+    subject: '영어Ⅰ',
+    evalMethod: '단어 쪽지시험 (30문항)',
+    materials: ['빨간색 채점 펜', '단어장'],
+    description: '1교시 시작 전 5단원 핵심 어휘 및 숙어 30문항 쪽지시험을 실시합니다.',
+    authorRole: 'president',
+    authorName: '김신성 (반장)'
+  },
+  {
+    id: 'evt-c10-005',
+    title: '2학년 10반 마니또 발표 및 학급 롤링페이퍼',
+    category: 'class_event',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 10,
+    startDate: '2026-12-11',
+    endDate: '2026-12-11',
+    dueTime: '16:00',
+    subject: '학급 자치',
+    evalMethod: '',
+    materials: ['마니또 선물 (5천원 이내)', '색연필/네임펜'],
+    description: '기말고사 전 서로를 응원하며 한 학기 동안 비밀리에 진행한 마니또 발표 및 롤링페이퍼 작성 시간입니다.',
+    authorRole: 'president',
+    authorName: '김신성 (반장)'
+  },
+
+  // --- 4. 타 학급 샘플 일정 (반별 필터링 분리 검증용) ---
+  {
+    id: 'evt-c01-001',
+    title: '2학년 1반 물리학Ⅰ 빛의 굴절 실험 보고서',
+    category: 'assessment',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 1,
+    startDate: '2026-11-20',
+    endDate: '2026-11-20',
+    dueTime: '16:30',
+    subject: '물리학Ⅰ',
+    evalMethod: '실험 보고서 제출',
+    materials: ['실험 관찰일지', '노트북'],
+    description: '스넬의 법칙 검증 실험 데이터 분석 보고서 제출',
+    authorRole: 'teacher',
+    authorName: '최물리 교사'
+  },
+  {
+    id: 'evt-c02-001',
+    title: '1학년 2반 통합사회 기후변화 해결방안 포스터',
+    category: 'assessment',
+    scope: 'class',
+    targetGrade: 1,
+    targetClass: 2,
+    startDate: '2026-11-24',
+    endDate: '2026-11-24',
+    dueTime: '15:00',
+    subject: '통합사회',
+    evalMethod: '모둠별 포스터 발표',
+    materials: ['4절 도화지', '마카펜'],
+    description: '기후위기 대응 환경 정책 제안서 및 포스터 제작',
+    authorRole: 'teacher',
+    authorName: '정사회 교사'
+  }
+];
+
+// --- 2. Initialization & LocalStorage Load/Save ---
+function initApp() {
+  loadData();
+  setupEventListeners();
+  renderApp();
+  showToast('신성여고 AI 학교 일정 플래너에 오신 것을 환영합니다! 🎉', 'success');
+}
+
+function loadData() {
+  // 1. Events
+  const savedEvents = localStorage.getItem(APP_STORAGE_KEY);
+  if (savedEvents) {
+    try {
+      state.events = JSON.parse(savedEvents);
+    } catch (e) {
+      console.error('Failed to parse saved events:', e);
+      state.events = [...DEFAULT_EVENTS];
+    }
+  } else {
+    state.events = [...DEFAULT_EVENTS];
+    saveEvents();
+  }
+
+  // 2. Checklist
+  const savedChecks = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+  if (savedChecks) {
+    try {
+      state.suppliesChecks = JSON.parse(savedChecks);
+    } catch (e) {
+      state.suppliesChecks = {};
+    }
+  }
+
+  // 3. User Session
+  const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+  if (savedUser) {
+    try {
+      state.currentUser = JSON.parse(savedUser);
+    } catch (e) {
+      // default president
+    }
+  }
+}
+
+function saveEvents() {
+  localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(state.events));
+}
+
+function saveChecks() {
+  localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(state.suppliesChecks));
+}
+
+function saveUser() {
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
+}
+
+// Reset to default demo data
+function resetToDefaultData() {
+  if (confirm('모든 데이터를 신성여고 기본 예시 데이터로 초기화하시겠습니까? (직접 등록한 일정은 지워집니다)')) {
+    state.events = JSON.parse(JSON.stringify(DEFAULT_EVENTS));
+    state.suppliesChecks = {};
+    saveEvents();
+    saveChecks();
+    renderApp();
+    showToast('기본 예시 데이터로 성공적으로 초기화되었습니다.', 'success');
+  }
+}
+
+// --- 3. Permission & Authorization Helpers ---
+/**
+ * Check if the current user can create an event under the specified target
+ */
+function canUserCreate(scope, targetGrade, targetClass) {
+  const { role, grade, classNum } = state.currentUser;
+  if (role === 'teacher') return true;
+  if (role === 'president') {
+    // Class presidents can only register events for their own assigned class
+    return scope === 'class' && Number(targetGrade) === grade && Number(targetClass) === classNum;
+  }
+  return false; // Students cannot create events
+}
+
+/**
+ * Check if the current user can edit or delete a specific event
+ */
+function canUserEditOrDelete(event) {
+  if (!event) return false;
+  const { role, grade, classNum } = state.currentUser;
+  if (role === 'teacher') return true;
+  if (role === 'president') {
+    // Can edit if it is their own class event
+    return event.scope === 'class' && Number(event.targetGrade) === grade && Number(event.targetClass) === classNum;
+  }
+  return false; // Students cannot edit or delete
+}
+
+// --- 4. Filtering Logic ---
+function getFilteredEvents() {
+  const { activeScope, selectedGrade, selectedClass, activeCategory, searchQuery, currentUser } = state;
+
+  return state.events.filter(event => {
+    // 1. Scope filter
+    if (activeScope === 'school') {
+      if (event.scope !== 'school') return false;
+    } else if (activeScope === 'grade') {
+      if (event.scope !== 'grade' || Number(event.targetGrade) !== Number(selectedGrade)) {
+        return false;
+      }
+    } else if (activeScope === 'class') {
+      if (
+        event.scope !== 'class' ||
+        Number(event.targetGrade) !== Number(selectedGrade) ||
+        Number(event.targetClass) !== Number(selectedClass)
+      ) {
+        return false;
+      }
+    } else if (activeScope === 'my') {
+      // My Personalized Schedule:
+      // Includes: School events + Grade events for my grade + Class events for my class
+      const isMySchool = event.scope === 'school';
+      const isMyGrade = event.scope === 'grade' && Number(event.targetGrade) === currentUser.grade;
+      const isMyClass = event.scope === 'class' && Number(event.targetGrade) === currentUser.grade && Number(event.targetClass) === currentUser.classNum;
+      if (!isMySchool && !isMyGrade && !isMyClass) return false;
+    }
+
+    // 2. Category Filter
+    if (activeCategory !== 'all' && event.category !== activeCategory) {
+      return false;
+    }
+
+    // 3. Search Query Filter
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase().trim();
+      const matchTitle = (event.title || '').toLowerCase().includes(q);
+      const matchSub = (event.subject || '').toLowerCase().includes(q);
+      const matchDesc = (event.description || '').toLowerCase().includes(q);
+      const matchMat = (event.materials || []).some(m => m.toLowerCase().includes(q));
+      if (!matchTitle && !matchSub && !matchDesc && !matchMat) return false;
+    }
+
+    return true;
+  });
+}
+
+// --- 5. Rendering Core ---
+function renderApp() {
+  updateUserRoleUI();
+  updateScopeBannerUI();
+  updateFilterBarVisibility();
+
+  const filteredEvents = getFilteredEvents();
+
+  // Update counts
+  document.getElementById('currentViewEventCount').textContent = filteredEvents.length;
+  document.getElementById('listEventCount').textContent = filteredEvents.length;
+
+  // Render Main View according to activeView
+  if (state.activeView === 'calendar') {
+    renderCalendarView(filteredEvents);
+  } else if (state.activeView === 'list') {
+    renderListView(filteredEvents);
+  } else if (state.activeView === 'assessment') {
+    renderAssessmentBoardView(filteredEvents);
+  }
+
+  // Render Sidebar Dashboards
+  renderTodayBriefing();
+  renderUpcomingAssessments();
+  renderSuppliesChecklist();
+  renderAIWorkloadAnalysis();
+}
+
+/**
+ * Update Role dropdown and badges
+ */
+function updateUserRoleUI() {
+  const roleSelect = document.getElementById('userRoleSelect');
+  roleSelect.value = state.currentUser.role;
+
+  const scopeBadge = document.getElementById('userScopeInfo');
+  if (state.currentUser.role === 'teacher') {
+    scopeBadge.textContent = '교무실 (전체 관리)';
+    scopeBadge.style.background = '#DCFCE7';
+    scopeBadge.style.color = '#15803D';
+  } else if (state.currentUser.role === 'president') {
+    scopeBadge.textContent = `${state.currentUser.grade}학년 ${state.currentUser.classNum}반 반장`;
+    scopeBadge.style.background = '#FEF3C7';
+    scopeBadge.style.color = '#B45309';
+  } else {
+    scopeBadge.textContent = `${state.currentUser.grade}학년 ${state.currentUser.classNum}반 학생`;
+    scopeBadge.style.background = '#E0E7FF';
+    scopeBadge.style.color = '#3730A3';
+  }
+
+  // Permission notice in event add button
+  const addBtn = document.getElementById('openNewEventBtn');
+  if (state.currentUser.role === 'student') {
+    addBtn.classList.remove('btn-primary');
+    addBtn.classList.add('btn-secondary');
+    addBtn.title = '학생은 일정을 조회만 할 수 있습니다';
+  } else {
+    addBtn.classList.remove('btn-secondary');
+    addBtn.classList.add('btn-primary');
+    addBtn.title = '새 일정 등록하기';
+  }
+}
+
+/**
+ * Update Scope Banner Text & Details
+ */
+function updateScopeBannerUI() {
+  const titleEl = document.getElementById('scopeBannerTitle');
+  const subEl = document.getElementById('scopeBannerSubtitle');
+  const iconEl = document.querySelector('#scopeBanner .banner-icon');
+
+  if (state.activeScope === 'school') {
+    iconEl.textContent = '🏫';
+    titleEl.textContent = '학교 전체 일정';
+    subEl.textContent = '개학식, 방학식, 정기고사, 교내 축제 등 전교생 대상의 주요 학사일정입니다.';
+  } else if (state.activeScope === 'grade') {
+    iconEl.textContent = '🎓';
+    titleEl.textContent = `${state.selectedGrade}학년 전체 일정`;
+    subEl.textContent = `${state.selectedGrade}학년 전국연합학력평가, 학년 행사, 진로 체험활동 일정입니다.`;
+  } else if (state.activeScope === 'class') {
+    iconEl.textContent = '👥';
+    titleEl.textContent = `${state.selectedGrade}학년 ${state.selectedClass}반 학급 & 수행평가 일정`;
+    subEl.textContent = `우리 반의 교과목별 수행평가, 과제 마감일, 평가 방법, 준비물 및 학급 자치 일정입니다.`;
+  } else if (state.activeScope === 'my') {
+    iconEl.textContent = '⭐';
+    titleEl.textContent = `나(${state.currentUser.grade}학년 ${state.currentUser.classNum}반)의 맞춤 종합 캘린더`;
+    subEl.textContent = `학교 전체 행사와 내 학년, 내 반의 모든 수행평가와 일정을 한 화면에 모아서 확인합니다.`;
+  }
+}
+
+/**
+ * Show/Hide Grade & Class pill selectors depending on current scope
+ */
+function updateFilterBarVisibility() {
+  const gradeGroup = document.getElementById('gradeFilterGroup');
+  const classGroup = document.getElementById('classFilterGroup');
+
+  if (state.activeScope === 'school' || state.activeScope === 'my') {
+    gradeGroup.style.display = 'none';
+    classGroup.style.display = 'none';
+  } else if (state.activeScope === 'grade') {
+    gradeGroup.style.display = 'flex';
+    classGroup.style.display = 'none';
+  } else if (state.activeScope === 'class') {
+    gradeGroup.style.display = 'flex';
+    classGroup.style.display = 'flex';
+  }
+
+  // Update grade pills active state
+  document.querySelectorAll('#gradePillTabs .pill-tab').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.grade) === Number(state.selectedGrade));
+  });
+
+  // Update class dropdown
+  const classSelect = document.getElementById('classSelectDropdown');
+  if (classSelect) {
+    classSelect.value = state.selectedClass;
+  }
+}
+
+// --- 6. View 1: Monthly Calendar ---
+function renderCalendarView(filteredEvents) {
+  const year = state.currentCalYear;
+  const month = state.currentCalMonth; // 0-based
+
+  // Title: "2026년 11월"
+  document.getElementById('currentMonthYearDisplay').textContent = `${year}년 ${month + 1}월`;
+
+  const grid = document.getElementById('calendarDaysGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(year, month, 1);
+  const startDayOfWeek = firstDay.getDay(); // 0 = Sun
+  const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
+
+  // Previous month padding days
+  const prevMonthLastDate = new Date(year, month, 0).getDate();
+  for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    const dayNum = prevMonthLastDate - i;
+    const cellDateStr = formatDateStr(new Date(year, month - 1, dayNum));
+    const cell = createCalendarDayCell(dayNum, cellDateStr, true, filteredEvents);
+    grid.appendChild(cell);
+  }
+
+  // Current month days
+  for (let date = 1; date <= lastDateOfMonth; date++) {
+    const cellDate = new Date(year, month, date);
+    const cellDateStr = formatDateStr(cellDate);
+    const isToday = cellDateStr === TODAY_STR;
+    const cell = createCalendarDayCell(date, cellDateStr, false, filteredEvents, isToday);
+    grid.appendChild(cell);
+  }
+
+  // Next month padding days to complete 35 or 42 cells
+  const totalCells = grid.children.length;
+  const remainingCells = (totalCells <= 35) ? (35 - totalCells) : (42 - totalCells);
+  for (let date = 1; date <= remainingCells; date++) {
+    const cellDateStr = formatDateStr(new Date(year, month + 1, date));
+    const cell = createCalendarDayCell(date, cellDateStr, true, filteredEvents);
+    grid.appendChild(cell);
+  }
+}
+
+function createCalendarDayCell(dayNum, dateStr, isOtherMonth, filteredEvents, isToday = false) {
+  const cell = document.createElement('div');
+  cell.className = 'calendar-day-cell';
+  if (isOtherMonth) cell.classList.add('other-month');
+  if (isToday) cell.classList.add('today');
+
+  const cellDate = new Date(dateStr + 'T00:00:00');
+  const dayOfWeek = cellDate.getDay();
+  if (dayOfWeek === 0) cell.classList.add('sunday');
+  if (dayOfWeek === 6) cell.classList.add('saturday');
+
+  if (state.selectedDate === dateStr) {
+    cell.classList.add('selected');
+  }
+
+  // Header (Day number)
+  const header = document.createElement('div');
+  header.className = 'day-header';
+
+  const numSpan = document.createElement('span');
+  numSpan.className = 'day-number';
+  numSpan.textContent = dayNum;
+  header.appendChild(numSpan);
+
+  cell.appendChild(header);
+
+  // Events on this day
+  const dayEvents = filteredEvents.filter(e => isDateInRange(dateStr, e.startDate, e.endDate));
+
+  const eventsContainer = document.createElement('div');
+  eventsContainer.className = 'day-events-container';
+
+  const maxDisplay = 3;
+  dayEvents.slice(0, maxDisplay).forEach(event => {
+    const chip = document.createElement('div');
+    chip.className = `event-chip cat-${event.category}`;
+    chip.title = `${getCategoryLabel(event.category)}: ${event.title}`;
+    chip.innerHTML = `<span class="chip-title">${getCategoryEmoji(event.category)} ${escapeHtml(event.title)}</span>`;
+    
+    // Stop propagation so clicking the chip opens the event detail directly
+    chip.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      openEventDetailModal(event);
+    });
+
+    eventsContainer.appendChild(chip);
+  });
+
+  if (dayEvents.length > maxDisplay) {
+    const moreChip = document.createElement('div');
+    moreChip.className = 'more-events-chip';
+    moreChip.textContent = `+${dayEvents.length - maxDisplay}개 더보기`;
+    eventsContainer.appendChild(moreChip);
+  }
+
+  cell.appendChild(eventsContainer);
+
+  // Cell click: open day details modal
+  cell.addEventListener('click', () => {
+    state.selectedDate = dateStr;
+    renderApp();
+    openDayDetailModal(dateStr, dayEvents);
+  });
+
+  return cell;
+}
+
+// --- 7. View 2: List / Timeline ---
+function renderListView(filteredEvents) {
+  const container = document.getElementById('eventsListContainer');
+  container.innerHTML = '';
+
+  if (filteredEvents.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state-text" style="padding: 3rem 1rem;">
+        🔍 해당 조건에 일치하는 일정이 없습니다. 다른 범위나 필터를 선택해 보세요.
+      </div>
+    `;
+    return;
+  }
+
+  // Sort according to select
+  const sortVal = document.getElementById('listSortSelect').value;
+  const sorted = [...filteredEvents].sort((a, b) => {
+    if (sortVal === 'date-asc') return a.startDate.localeCompare(b.startDate);
+    if (sortVal === 'date-desc') return b.startDate.localeCompare(a.startDate);
+    if (sortVal === 'title-asc') return a.title.localeCompare(b.title);
+    return 0;
+  });
+
+  sorted.forEach(event => {
+    const card = document.createElement('div');
+    card.className = 'timeline-event-card';
+
+    const ddayText = getDDayText(event.startDate);
+    const ddayClass = getDDayBadgeClass(event.startDate);
+
+    // Format Start Date
+    const sDate = new Date(event.startDate + 'T00:00:00');
+    const day = sDate.getDate();
+    const ym = `${sDate.getFullYear()}.${String(sDate.getMonth() + 1).padStart(2, '0')}`;
+    const weekdayStr = ['일', '월', '화', '수', '목', '금', '토'][sDate.getDay()];
+
+    const materialsHtml = (event.materials && event.materials.length > 0)
+      ? `<div class="materials-tags">🎒 준비물: ${event.materials.map(m => `<span class="mat-tag">${escapeHtml(m)}</span>`).join('')}</div>`
+      : '';
+
+    card.innerHTML = `
+      <div class="timeline-date-col">
+        <span class="timeline-date-day">${day}일(${weekdayStr})</span>
+        <span class="timeline-date-ym">${ym}</span>
+        <span class="dday-badge ${ddayClass}" style="margin-top:6px;">${ddayText}</span>
+      </div>
+      <div class="timeline-content-col">
+        <div class="timeline-card-header">
+          <span class="category-pill ${event.category}">${getCategoryLabel(event.category)}</span>
+          <span class="scope-pill">${getScopeLabel(event)}</span>
+          ${event.dueTime ? `<span class="due-time-pill" style="font-size:0.75rem; color:#4F46E5; font-weight:700;">⏰ ${event.dueTime}</span>` : ''}
+        </div>
+        <h4 class="timeline-event-title">${escapeHtml(event.title)}</h4>
+        <p class="timeline-event-desc">${escapeHtml(event.description || '상세 내용이 없습니다.')}</p>
+        <div class="timeline-meta-row">
+          ${event.subject ? `<span><strong>과목:</strong> ${escapeHtml(event.subject)}</span>` : ''}
+          ${event.evalMethod ? `<span><strong>평가 방식:</strong> ${escapeHtml(event.evalMethod)}</span>` : ''}
+          ${materialsHtml}
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      openEventDetailModal(event);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+// --- 8. View 3: Assessment Board ---
+function renderAssessmentBoardView(filteredEvents) {
+  const container = document.getElementById('assessmentCardsGrid');
+  container.innerHTML = '';
+
+  // Only assessments and exams
+  const assessments = filteredEvents.filter(e => e.category === 'assessment' || e.category === 'exam');
+
+  let urgentCount = 0;
+  let activeCount = 0;
+
+  assessments.forEach(e => {
+    const diff = getDaysDifference(TODAY_STR, e.startDate);
+    if (diff >= 0 && diff <= 3) urgentCount++;
+    if (diff >= 0) activeCount++;
+  });
+
+  document.getElementById('urgentCount').textContent = urgentCount;
+  document.getElementById('activeCount').textContent = activeCount;
+
+  if (assessments.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state-text" style="grid-column: 1 / -1; padding: 3rem 1rem;">
+        📝 현재 선택된 범위에 등록된 수행평가나 시험 일정이 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  // Sort by start date ascending
+  assessments.sort((a, b) => a.startDate.localeCompare(b.startDate));
+
+  assessments.forEach(event => {
+    const card = document.createElement('div');
+    card.className = 'assessment-card';
+
+    const ddayText = getDDayText(event.startDate);
+    const ddayClass = getDDayBadgeClass(event.startDate);
+
+    const materialsHtml = (event.materials && event.materials.length > 0)
+      ? event.materials.map(m => `<span class="mat-tag">${escapeHtml(m)}</span>`).join(' ')
+      : '<span style="color:#94A3B8;">준비물 없음</span>';
+
+    card.innerHTML = `
+      <div class="as-card-top">
+        <span class="as-subject-badge">${escapeHtml(event.subject || getCategoryLabel(event.category))}</span>
+        <span class="dday-badge ${ddayClass}">${ddayText}</span>
+      </div>
+      <h4 class="as-card-title">${escapeHtml(event.title)}</h4>
+      <div class="as-card-info">
+        <div class="as-info-row">
+          <span class="as-info-label">제출/평가일</span>
+          <span class="as-info-value">${event.startDate} ${event.dueTime ? `(${event.dueTime})` : ''}</span>
+        </div>
+        <div class="as-info-row">
+          <span class="as-info-label">대상</span>
+          <span class="as-info-value">${getScopeLabel(event)}</span>
+        </div>
+        <div class="as-info-row">
+          <span class="as-info-label">평가 방법</span>
+          <span class="as-info-value">${escapeHtml(event.evalMethod || '일반 지필/보고서')}</span>
+        </div>
+      </div>
+      <div class="as-supplies-preview">
+        <div class="as-supplies-title">🎒 필수 준비물</div>
+        <div class="materials-tags">${materialsHtml}</div>
+      </div>
+      <div class="as-card-actions">
+        <button class="btn btn-outline-primary btn-sm w-full view-detail-btn">
+          상세 정보 & AI 가이드 보기
+        </button>
+      </div>
+    `;
+
+    card.querySelector('.view-detail-btn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      openEventDetailModal(event);
+    });
+
+    card.addEventListener('click', () => {
+      openEventDetailModal(event);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+// --- 9. Sidebar Widgets ---
+function renderTodayBriefing() {
+  document.getElementById('currentDateDisplay').textContent = TODAY_STR;
+  const listEl = document.getElementById('todayEventsList');
+  listEl.innerHTML = '';
+
+  // Get all events occurring today (for current student scope)
+  const myEvents = state.events.filter(e => {
+    const isToday = isDateInRange(TODAY_STR, e.startDate, e.endDate);
+    if (!isToday) return false;
+    // Check if relevant to current user
+    if (e.scope === 'school') return true;
+    if (e.scope === 'grade' && Number(e.targetGrade) === state.currentUser.grade) return true;
+    if (e.scope === 'class' && Number(e.targetGrade) === state.currentUser.grade && Number(e.targetClass) === state.currentUser.classNum) return true;
+    if (state.currentUser.role === 'teacher') return true;
+    return false;
+  });
+
+  if (myEvents.length === 0) {
+    listEl.innerHTML = `<div class="empty-state-text">오늘 예정된 학사 일정이 없습니다. 편안한 하루 보내세요! 🌿</div>`;
+    return;
+  }
+
+  myEvents.forEach(event => {
+    const item = document.createElement('div');
+    item.className = 'compact-event-item';
+    item.innerHTML = `
+      <span class="compact-event-icon">${getCategoryEmoji(event.category)}</span>
+      <div class="compact-event-info">
+        <div class="compact-event-title">${escapeHtml(event.title)}</div>
+        <div class="compact-event-sub">${getCategoryLabel(event.category)} · ${getScopeLabel(event)}</div>
+      </div>
+    `;
+    item.addEventListener('click', () => openEventDetailModal(event));
+    listEl.appendChild(item);
+  });
+}
+
+function renderUpcomingAssessments() {
+  const container = document.getElementById('upcomingAssessmentList');
+  container.innerHTML = '';
+
+  // Upcoming assessments for current user
+  const relevantAssessments = state.events.filter(e => {
+    if (e.category !== 'assessment' && e.category !== 'exam') return false;
+    // Check user scope
+    const isTarget = (
+      e.scope === 'school' ||
+      (e.scope === 'grade' && Number(e.targetGrade) === state.currentUser.grade) ||
+      (e.scope === 'class' && Number(e.targetGrade) === state.currentUser.grade && Number(e.targetClass) === state.currentUser.classNum) ||
+      state.currentUser.role === 'teacher'
+    );
+    if (!isTarget) return false;
+
+    // Must be today or future
+    const diff = getDaysDifference(TODAY_STR, e.startDate);
+    return diff >= 0;
+  });
+
+  relevantAssessments.sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const topList = relevantAssessments.slice(0, 4);
+
+  document.getElementById('upcomingCount').textContent = relevantAssessments.length;
+
+  if (topList.length === 0) {
+    container.innerHTML = `<div class="empty-state-text">다가오는 마감 임박 일정이 없습니다. ✨</div>`;
+    return;
+  }
+
+  topList.forEach(event => {
+    const item = document.createElement('div');
+    item.className = 'dday-card-item';
+    const ddayText = getDDayText(event.startDate);
+    const ddayClass = getDDayBadgeClass(event.startDate);
+
+    item.innerHTML = `
+      <div style="flex:1; min-width:0;">
+        <div style="font-weight:700; font-size:0.85rem; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ${escapeHtml(event.title)}
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+          ${event.startDate} ${event.dueTime ? `· ${event.dueTime}` : ''}
+        </div>
+      </div>
+      <span class="dday-badge ${ddayClass}" style="margin-left:0.5rem;">${ddayText}</span>
+    `;
+
+    item.addEventListener('click', () => openEventDetailModal(event));
+    container.appendChild(item);
+  });
+}
+
+function renderSuppliesChecklist() {
+  const container = document.getElementById('suppliesChecklistContainer');
+  container.innerHTML = '';
+
+  // Collect all supplies from upcoming events relevant to current student
+  const relevantEvents = state.events.filter(e => {
+    const isTarget = (
+      e.scope === 'school' ||
+      (e.scope === 'grade' && Number(e.targetGrade) === state.currentUser.grade) ||
+      (e.scope === 'class' && Number(e.targetGrade) === state.currentUser.grade && Number(e.targetClass) === state.currentUser.classNum) ||
+      state.currentUser.role === 'teacher'
+    );
+    if (!isTarget) return false;
+    const diff = getDaysDifference(TODAY_STR, e.startDate);
+    return diff >= -1 && diff <= 14; // Past 1 day or within 2 weeks
+  });
+
+  let totalItems = 0;
+  let completedItems = 0;
+
+  relevantEvents.forEach(e => {
+    if (!e.materials || e.materials.length === 0) return;
+
+    e.materials.forEach((mat, idx) => {
+      totalItems++;
+      const checkKey = `${e.id}_mat_${idx}`;
+      const isChecked = !!state.suppliesChecks[checkKey];
+      if (isChecked) completedItems++;
+
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'check-item';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `chk_${checkKey}`;
+      checkbox.checked = isChecked;
+
+      checkbox.addEventListener('change', () => {
+        state.suppliesChecks[checkKey] = checkbox.checked;
+        saveChecks();
+        renderSuppliesChecklist();
+      });
+
+      const label = document.createElement('label');
+      label.htmlFor = `chk_${checkKey}`;
+      label.className = `check-label ${isChecked ? 'completed' : ''}`;
+      label.innerHTML = `
+        <strong>${escapeHtml(mat)}</strong>
+        <span class="check-event-tag">${escapeHtml(e.title)} (${e.startDate})</span>
+      `;
+
+      itemDiv.appendChild(checkbox);
+      itemDiv.appendChild(label);
+      container.appendChild(itemDiv);
+    });
+  });
+
+  const percent = totalItems === 0 ? 0 : Math.round((completedItems / totalItems) * 100);
+  document.getElementById('checklistProgressFill').style.width = `${percent}%`;
+  document.getElementById('checklistStats').textContent = `${completedItems} / ${totalItems} 항목 준비 완료`;
+  document.getElementById('checklistPercent').textContent = `${percent}%`;
+
+  if (totalItems === 0) {
+    container.innerHTML = `<div class="empty-state-text">챙겨야 할 준비물이 없습니다. 가방이 가볍네요! 🎒</div>`;
+  }
+}
+
+/**
+ * AI Smart Workload & Conflict Analysis
+ */
+function renderAIWorkloadAnalysis() {
+  const alertContainer = document.getElementById('aiWorkloadAlert');
+  alertContainer.innerHTML = '';
+
+  // Look at events in the upcoming 7 days
+  const upcomingEvents = state.events.filter(e => {
+    const diff = getDaysDifference(TODAY_STR, e.startDate);
+    const isTarget = (
+      e.scope === 'school' ||
+      (e.scope === 'grade' && Number(e.targetGrade) === state.currentUser.grade) ||
+      (e.scope === 'class' && Number(e.targetGrade) === state.currentUser.grade && Number(e.targetClass) === state.currentUser.classNum)
+    );
+    return isTarget && diff >= 0 && diff <= 7 && (e.category === 'assessment' || e.category === 'exam');
+  });
+
+  if (upcomingEvents.length >= 2) {
+    alertContainer.innerHTML = `
+      <div class="ai-alert-box">
+        <span>⚠️</span>
+        <div>
+          <strong>[AI 학습 집중 조언]</strong><br>
+          향후 7일 내에 <strong>${upcomingEvents.length}개</strong>의 수행평가/시험 일정이 집중되어 있습니다! 
+          하루 전 벼락치기보다는 과목별 우선순위(D-Day 순)를 정해 분산 학습하는 것을 추천합니다.
+        </div>
+      </div>
+    `;
+  } else {
+    alertContainer.innerHTML = `
+      <div class="ai-alert-box" style="background:#F0FDF4; border-color:#BBF7D0; color:#166534;">
+        <span>🌱</span>
+        <div>
+          <strong>[AI 일정 현황]</strong><br>
+          현재 주간 학습 부하가 매우 안정적입니다. 여유 있게 자기주도 학습 계획을 세워보세요!
+        </div>
+      </div>
+    `;
+  }
+}
+
+// --- 10. Modal Operations ---
+// 1. Day Detail Modal
+function openDayDetailModal(dateStr, dayEvents) {
+  const modal = document.getElementById('dayDetailModal');
+  const d = new Date(dateStr + 'T00:00:00');
+  const weekdayStr = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+
+  document.getElementById('dayDetailModalDate').textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${weekdayStr})`;
+  document.getElementById('dayDetailModalSubtitle').textContent = `등록된 일정: 총 ${dayEvents.length}건`;
+
+  const list = document.getElementById('dayEventsDetailList');
+  list.innerHTML = '';
+
+  if (dayEvents.length === 0) {
+    list.innerHTML = `<div class="empty-state-text" style="padding:2rem;">이 날짜에 등록된 일정이 없습니다.</div>`;
+  } else {
+    dayEvents.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'compact-event-item';
+      item.innerHTML = `
+        <span class="compact-event-icon">${getCategoryEmoji(e.category)}</span>
+        <div class="compact-event-info">
+          <div class="compact-event-title">${escapeHtml(e.title)}</div>
+          <div class="compact-event-sub">
+            <span class="category-pill ${e.category}" style="font-size:0.7rem; padding:1px 6px;">${getCategoryLabel(e.category)}</span>
+            <span style="margin-left:4px;">${getScopeLabel(e)}</span>
+            ${e.dueTime ? `· ⏰ ${e.dueTime}` : ''}
+          </div>
+        </div>
+      `;
+      item.addEventListener('click', () => {
+        closeModal('dayDetailModal');
+        openEventDetailModal(e);
+      });
+      list.appendChild(item);
+    });
+  }
+
+  // Button to add event on this specific date
+  const addBtn = document.getElementById('addEventOnSelectedDateBtn');
+  addBtn.onclick = () => {
+    closeModal('dayDetailModal');
+    openEventFormModal(null, dateStr);
+  };
+
+  modal.style.display = 'flex';
+}
+
+// 2. Event Detail Modal
+function openEventDetailModal(event) {
+  const modal = document.getElementById('eventDetailModal');
+
+  // Fill in fields
+  const catBadge = document.getElementById('detailCategoryBadge');
+  catBadge.className = `category-pill ${event.category}`;
+  catBadge.textContent = getCategoryLabel(event.category);
+
+  document.getElementById('detailEventTitle').textContent = event.title;
+  document.getElementById('detailPeriod').textContent = (event.startDate === event.endDate)
+    ? event.startDate
+    : `${event.startDate} ~ ${event.endDate}`;
+  document.getElementById('detailScope').textContent = getScopeLabel(event);
+  document.getElementById('detailDueTime').textContent = event.dueTime ? `${event.dueTime} 까지` : '별도 지정 없음';
+  document.getElementById('detailAuthor').textContent = `${event.authorName || '작성자'} (${event.authorRole === 'teacher' ? '교사' : '반장'})`;
+
+  // Assessment Box
+  const assessBox = document.getElementById('detailAssessmentBox');
+  if (event.category === 'assessment' || event.subject) {
+    assessBox.style.display = 'block';
+    document.getElementById('detailSubject').textContent = event.subject || '-';
+    document.getElementById('detailEvalMethod').textContent = event.evalMethod || '-';
+  } else {
+    assessBox.style.display = 'none';
+  }
+
+  document.getElementById('detailDescription').textContent = event.description || '상세 안내 내용이 등록되지 않았습니다.';
+
+  // Materials Checklist in Modal
+  const matContainer = document.getElementById('detailMaterialsList');
+  matContainer.innerHTML = '';
+  if (event.materials && event.materials.length > 0) {
+    event.materials.forEach((mat, idx) => {
+      const checkKey = `${event.id}_mat_${idx}`;
+      const isChecked = !!state.suppliesChecks[checkKey];
+
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'check-item';
+      itemDiv.innerHTML = `
+        <input type="checkbox" id="modal_chk_${checkKey}" ${isChecked ? 'checked' : ''}>
+        <label for="modal_chk_${checkKey}" class="check-label ${isChecked ? 'completed' : ''}">
+          ${escapeHtml(mat)}
+        </label>
+      `;
+
+      itemDiv.querySelector('input').addEventListener('change', (ev) => {
+        state.suppliesChecks[checkKey] = ev.target.checked;
+        saveChecks();
+        renderSuppliesChecklist();
+        // Update label strike-through
+        itemDiv.querySelector('.check-label').classList.toggle('completed', ev.target.checked);
+      });
+
+      matContainer.appendChild(itemDiv);
+    });
+  } else {
+    matContainer.innerHTML = `<span style="color:var(--text-light); font-size:0.85rem;">필요한 준비물이 없습니다.</span>`;
+  }
+
+  // AI Tip
+  const aiTipContent = document.getElementById('aiTipContent');
+  aiTipContent.textContent = 'AI 준비 로드맵 버튼을 누르면 이 수행평가를 효과적으로 준비하기 위한 D-Day 맞춤형 학습 조언을 보여줍니다.';
+  
+  const generateAITipBtn = document.getElementById('generateAITipBtn');
+  generateAITipBtn.onclick = () => {
+    generateAIStudyRoadmap(event);
+  };
+
+  // Action buttons permissions check
+  const editBtn = document.getElementById('editEventBtn');
+  const deleteBtn = document.getElementById('deleteEventBtn');
+  const isPermitted = canUserEditOrDelete(event);
+
+  if (isPermitted) {
+    editBtn.style.display = 'inline-flex';
+    deleteBtn.style.display = 'inline-flex';
+
+    editBtn.onclick = () => {
+      closeModal('eventDetailModal');
+      openEventFormModal(event);
+    };
+
+    deleteBtn.onclick = () => {
+      if (confirm(`'${event.title}' 일정을 정말로 삭제하시겠습니까?`)) {
+        state.events = state.events.filter(e => e.id !== event.id);
+        saveEvents();
+        closeModal('eventDetailModal');
+        renderApp();
+        showToast('일정이 성공적으로 삭제되었습니다.', 'warning');
+      }
+    };
+  } else {
+    editBtn.style.display = 'none';
+    deleteBtn.style.display = 'none';
+  }
+
+  modal.style.display = 'flex';
+}
+
+/**
+ * Generate AI study roadmap dynamically based on event
+ */
+function generateAIStudyRoadmap(event) {
+  const aiTipContent = document.getElementById('aiTipContent');
+  aiTipContent.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:0.4rem;">
+      <div><strong>🎯 AI 맞춤형 준비 3단계 로드맵</strong></div>
+      <div>1️⃣ <strong>D-7 [자료 수집 & 개요 작성]:</strong> 교과서 핵심 개념 복습 및 관련 주제 논문/기사 조사, A4 개요서 초안 설계</div>
+      <div>2️⃣ <strong>D-3 [본문 작성 및 교차 점검]:</strong> 평가 루브릭(채점 기준)에 맞춰 <strong>${escapeHtml(event.subject || '해당 과목')}</strong> 핵심 어휘 반영, 준비물(${event.materials && event.materials.length ? event.materials.join(', ') : '필기도구'}) 사전 구비</div>
+      <div>3️⃣ <strong>D-Day [최종 리허설]:</strong> 마감 시간(${event.dueTime || '당일'}) 1시간 전 최종 오탈자 확인 및 규격 파일(PDF/양식) 저장 완료</div>
+      <div style="margin-top:4px; font-weight:700; color:#6D28D9;">💡 AI 조언: 서술형 평가 시 구체적 실생활 사례와 자신의 생각을 3:7 비율로 구성하면 고득점에 유리합니다!</div>
+    </div>
+  `;
+}
+
+// 3. Add / Edit Event Form Modal
+function openEventFormModal(eventToEdit = null, prefilledDate = null) {
+  // Check permission to open
+  if (state.currentUser.role === 'student') {
+    showToast('학생 모드는 일정 등록 권한이 없습니다. 상단에서 교사 또는 반장으로 전환해 주세요.', 'error');
+    return;
+  }
+
+  const modal = document.getElementById('eventFormModal');
+  const form = document.getElementById('eventForm');
+  form.reset();
+
+  const titleEl = document.getElementById('formModalTitle');
+  const idInput = document.getElementById('formEventId');
+  const permBanner = document.getElementById('formPermissionText');
+
+  // Permission text
+  if (state.currentUser.role === 'teacher') {
+    permBanner.textContent = '현재 권한: 교사 (학교 전체, 학년별, 반별 모든 일정 등록/수정 가능)';
+  } else if (state.currentUser.role === 'president') {
+    permBanner.textContent = `현재 권한: 반장 (${state.currentUser.grade}학년 ${state.currentUser.classNum}반 전용 일정만 등록/수정 가능)`;
+  }
+
+  // Setup Scope Options according to role
+  const scopeSelect = document.getElementById('formScope');
+  const gradeCol = document.getElementById('formGradeCol');
+  const classCol = document.getElementById('formClassCol');
+  const targetGradeSelect = document.getElementById('formTargetGrade');
+  const targetClassSelect = document.getElementById('formTargetClass');
+
+  if (state.currentUser.role === 'president') {
+    // President can only select 'class'
+    scopeSelect.value = 'class';
+    scopeSelect.disabled = true; // Lock scope
+    targetGradeSelect.value = state.currentUser.grade;
+    targetGradeSelect.disabled = true;
+    targetClassSelect.value = state.currentUser.classNum;
+    targetClassSelect.disabled = true;
+    gradeCol.style.display = 'flex';
+    classCol.style.display = 'flex';
+  } else {
+    // Teacher can select anything
+    scopeSelect.disabled = false;
+    targetGradeSelect.disabled = false;
+    targetClassSelect.disabled = false;
+  }
+
+  // Handling form values
+  if (eventToEdit) {
+    titleEl.textContent = '일정 수정';
+    idInput.value = eventToEdit.id;
+    document.getElementById('formTitle').value = eventToEdit.title;
+    document.getElementById('formCategory').value = eventToEdit.category;
+    scopeSelect.value = eventToEdit.scope;
+    targetGradeSelect.value = eventToEdit.targetGrade || 2;
+    targetClassSelect.value = eventToEdit.targetClass || 10;
+    document.getElementById('formStartDate').value = eventToEdit.startDate;
+    document.getElementById('formEndDate').value = eventToEdit.endDate;
+    document.getElementById('formDueTime').value = eventToEdit.dueTime || '17:00';
+    document.getElementById('formSubject').value = eventToEdit.subject || '';
+    document.getElementById('formEvalMethod').value = eventToEdit.evalMethod || '';
+    document.getElementById('formMaterials').value = (eventToEdit.materials || []).join(', ');
+    document.getElementById('formDescription').value = eventToEdit.description || '';
+  } else {
+    titleEl.textContent = '새 일정 등록';
+    idInput.value = '';
+    const defDate = prefilledDate || TODAY_STR;
+    document.getElementById('formStartDate').value = defDate;
+    document.getElementById('formEndDate').value = defDate;
+
+    if (state.currentUser.role === 'teacher') {
+      scopeSelect.value = state.activeScope === 'school' ? 'school' : (state.activeScope === 'grade' ? 'grade' : 'class');
+      targetGradeSelect.value = state.selectedGrade;
+      targetClassSelect.value = state.selectedClass;
+    }
+  }
+
+  updateFormScopeVisibility();
+  modal.style.display = 'flex';
+}
+
+function updateFormScopeVisibility() {
+  const scope = document.getElementById('formScope').value;
+  const gradeCol = document.getElementById('formGradeCol');
+  const classCol = document.getElementById('formClassCol');
+
+  if (scope === 'school') {
+    gradeCol.style.display = 'none';
+    classCol.style.display = 'none';
+  } else if (scope === 'grade') {
+    gradeCol.style.display = 'flex';
+    classCol.style.display = 'none';
+  } else if (scope === 'class') {
+    gradeCol.style.display = 'flex';
+    classCol.style.display = 'flex';
+  }
+}
+
+// Close generic modal
+function closeModal(modalId) {
+  const m = document.getElementById(modalId);
+  if (m) m.style.display = 'none';
+}
+
+// --- 11. AI Natural Language Processing ---
+/**
+ * Parse natural language school schedule string
+ * e.g., "다음주 금요일 2학년 10반 인공지능 기초 수행평가 발표, 노트북 준비"
+ */
+function parseNaturalLanguageSchedule(text) {
+  if (!text || text.trim() === '') return null;
+
+  const result = {
+    title: '',
+    category: 'assessment',
+    scope: 'class',
+    targetGrade: 2,
+    targetClass: 10,
+    startDate: TODAY_STR,
+    endDate: TODAY_STR,
+    dueTime: '17:00',
+    subject: '',
+    evalMethod: '',
+    materials: [],
+    description: text
+  };
+
+  // 1. Grade detection (e.g. 1학년, 2학년, 3학년)
+  const gradeMatch = text.match(/([1-3])\s*학년/);
+  if (gradeMatch) {
+    result.targetGrade = parseInt(gradeMatch[1]);
+    result.scope = 'grade';
+  }
+
+  // 2. Class detection (e.g. 10반, 1반)
+  const classMatch = text.match(/([1-9]|10)\s*반/);
+  if (classMatch) {
+    result.targetClass = parseInt(classMatch[1]);
+    result.scope = 'class';
+  }
+
+  // School scope detection
+  if (text.includes('전교') || text.includes('학교 전체') || text.includes('개교기념일') || text.includes('방학식') || text.includes('수능')) {
+    result.scope = 'school';
+  }
+
+  // 3. Category detection
+  if (text.includes('수행평가') || text.includes('과제') || text.includes('보고서') || text.includes('발표')) {
+    result.category = 'assessment';
+    result.evalMethod = text.includes('발표') ? '구두 발표 및 PPT' : '탐구 보고서 제출';
+  } else if (text.includes('지필평가') || text.includes('중간고사') || text.includes('기말고사') || text.includes('모의고사') || text.includes('쪽지시험') || text.includes('시험')) {
+    result.category = 'exam';
+  } else if (text.includes('축제') || text.includes('개학') || text.includes('졸업') || text.includes('방학')) {
+    result.category = 'school_event';
+  } else if (text.includes('수련회') || text.includes('체험') || text.includes('학력평가')) {
+    result.category = 'grade_event';
+  } else if (text.includes('단합') || text.includes('마니또') || text.includes('학급')) {
+    result.category = 'class_event';
+  }
+
+  // 4. Subject detection
+  const subjects = ['인공지능 기초', '문학', '수학Ⅱ', '수학', '영어Ⅰ', '영어', '물리학Ⅰ', '통합사회', '통합과학', '한국사', '진로와 직업', '미술', '음악', '체육'];
+  for (const sub of subjects) {
+    if (text.includes(sub)) {
+      result.subject = sub;
+      break;
+    }
+  }
+
+  // 5. Materials detection
+  const matMatch = text.match(/(?:준비물|준비|지참)[:\s]+([^,\n]+)/);
+  if (matMatch) {
+    result.materials = matMatch[1].split(/[\s,]+/).filter(Boolean);
+  } else {
+    // common keywords
+    const commonItems = ['노트북', '교과서', '필기도구', '계산기', '보고서', '유인물', '체육복', '태블릿'];
+    commonItems.forEach(item => {
+      if (text.includes(item)) result.materials.push(item);
+    });
+  }
+
+  // 6. Date detection
+  const baseDate = new Date(TODAY_DATE); // 2026-11-16 (Monday)
+
+  // Explicit MM월 DD일
+  const mdMatch = text.match(/([1-9]|1[0-2])\s*월\s*([1-9]|[12][0-9]|3[01])\s*일/);
+  if (mdMatch) {
+    const month = parseInt(mdMatch[1]);
+    const day = parseInt(mdMatch[2]);
+    const targetDate = new Date(2026, month - 1, day);
+    result.startDate = formatDateStr(targetDate);
+    result.endDate = formatDateStr(targetDate);
+  } else if (text.includes('내일')) {
+    baseDate.setDate(baseDate.getDate() + 1);
+    result.startDate = formatDateStr(baseDate);
+    result.endDate = formatDateStr(baseDate);
+  } else if (text.includes('모레')) {
+    baseDate.setDate(baseDate.getDate() + 2);
+    result.startDate = formatDateStr(baseDate);
+    result.endDate = formatDateStr(baseDate);
+  } else if (text.includes('다음주') || text.includes('다음 주')) {
+    // Find weekday e.g. 수요일
+    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    let targetDay = 5; // default Friday
+    weekdays.forEach((w, idx) => {
+      if (text.includes(w + '요일') || text.includes(w)) targetDay = idx;
+    });
+    // today is Monday (1), next week's target day is (7 - 1) + targetDay = 6 + targetDay
+    const daysToAdd = 7 + (targetDay - baseDate.getDay());
+    baseDate.setDate(baseDate.getDate() + daysToAdd);
+    result.startDate = formatDateStr(baseDate);
+    result.endDate = formatDateStr(baseDate);
+  } else if (text.includes('이번주') || text.includes('이번 주')) {
+    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    let targetDay = 5;
+    weekdays.forEach((w, idx) => {
+      if (text.includes(w + '요일')) targetDay = idx;
+    });
+    const daysToAdd = targetDay - baseDate.getDay();
+    baseDate.setDate(baseDate.getDate() + daysToAdd);
+    result.startDate = formatDateStr(baseDate);
+    result.endDate = formatDateStr(baseDate);
+  }
+
+  // 7. Extract cleaned Title
+  let titleCandidate = text
+    .replace(/(다음주|다음 주|이번주|이번 주|오늘|내일|모레|[1-9]|1[0-2]월\s*[1-9]|[12][0-9]일)/g, '')
+    .replace(/([1-3]학년|[1-9]|10반)/g, '')
+    .replace(/(?:준비물|준비)[:\s]+([^,\n]+)/g, '')
+    .trim();
+  
+  if (titleCandidate.length > 3) {
+    result.title = titleCandidate;
+  } else {
+    result.title = `${result.subject || '학급'} ${getCategoryLabel(result.category)}`;
+  }
+
+  return result;
+}
+
+// --- 12. Event Listeners & Binding ---
+function setupEventListeners() {
+  // Role switcher
+  document.getElementById('userRoleSelect').addEventListener('change', (e) => {
+    state.currentUser.role = e.target.value;
+    saveUser();
+    renderApp();
+    showToast(`사용자 권한이 '${getRoleLabel(e.target.value)}' 모드로 전환되었습니다.`, 'success');
+  });
+
+  // Scope Tabs
+  document.querySelectorAll('.scope-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.scope-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.activeScope = tab.dataset.scope;
+      renderApp();
+    });
+  });
+
+  // Grade Pills
+  document.querySelectorAll('#gradePillTabs .pill-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.selectedGrade = parseInt(btn.dataset.grade);
+      renderApp();
+    });
+  });
+
+  // Class Dropdown
+  document.getElementById('classSelectDropdown').addEventListener('change', (e) => {
+    state.selectedClass = parseInt(e.target.value);
+    renderApp();
+  });
+
+  // Category Filter Chips
+  document.querySelectorAll('#categoryChips .cat-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#categoryChips .cat-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.activeCategory = chip.dataset.cat;
+      renderApp();
+    });
+  });
+
+  // View Mode Toggles
+  const vCal = document.getElementById('viewCalendarBtn');
+  const vList = document.getElementById('viewListBtn');
+  const vAssess = document.getElementById('viewAssessmentBtn');
+
+  const secCal = document.getElementById('calendarViewSection');
+  const secList = document.getElementById('listViewSection');
+  const secAssess = document.getElementById('assessmentViewSection');
+
+  function setView(view) {
+    state.activeView = view;
+    vCal.classList.toggle('active', view === 'calendar');
+    vList.classList.toggle('active', view === 'list');
+    vAssess.classList.toggle('active', view === 'assessment');
+
+    secCal.style.display = view === 'calendar' ? 'block' : 'none';
+    secList.style.display = view === 'list' ? 'block' : 'none';
+    secAssess.style.display = view === 'assessment' ? 'block' : 'none';
+
+    renderApp();
+  }
+
+  vCal.addEventListener('click', () => setView('calendar'));
+  vList.addEventListener('click', () => setView('list'));
+  vAssess.addEventListener('click', () => setView('assessment'));
+
+  // Calendar Month Controls
+  document.getElementById('prevMonthBtn').addEventListener('click', () => {
+    if (state.currentCalMonth === 0) {
+      state.currentCalMonth = 11;
+      state.currentCalYear--;
+    } else {
+      state.currentCalMonth--;
+    }
+    renderApp();
+  });
+
+  document.getElementById('nextMonthBtn').addEventListener('click', () => {
+    if (state.currentCalMonth === 11) {
+      state.currentCalMonth = 0;
+      state.currentCalYear++;
+    } else {
+      state.currentCalMonth++;
+    }
+    renderApp();
+  });
+
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    state.currentCalYear = 2026;
+    state.currentCalMonth = 10; // November
+    state.selectedDate = TODAY_STR;
+    renderApp();
+  });
+
+  // List sort select
+  document.getElementById('listSortSelect').addEventListener('change', () => {
+    renderApp();
+  });
+
+  // Global Search
+  const searchInput = document.getElementById('globalSearchInput');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+  searchInput.addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    clearSearchBtn.style.display = state.searchQuery ? 'block' : 'none';
+    renderApp();
+  });
+
+  clearSearchBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    state.searchQuery = '';
+    clearSearchBtn.style.display = 'none';
+    renderApp();
+  });
+
+  // Add Event Button in Header
+  document.getElementById('openNewEventBtn').addEventListener('click', () => {
+    openEventFormModal();
+  });
+
+  // AI Parse Button
+  document.getElementById('aiParseBtn').addEventListener('click', () => {
+    const input = document.getElementById('aiQuickInput');
+    const text = input.value.trim();
+    if (!text) {
+      showToast('AI 입력창에 등록할 일정 내용을 입력해 주세요!', 'warning');
+      return;
+    }
+
+    const parsed = parseNaturalLanguageSchedule(text);
+    if (parsed) {
+      // Check user role permission before opening
+      if (state.currentUser.role === 'student') {
+        showToast('학생 모드는 조회 전용입니다. 교사 또는 반장 모드로 전환해 주세요.', 'error');
+        return;
+      }
+      openEventFormModal();
+
+      // Prefill fields
+      document.getElementById('formTitle').value = parsed.title;
+      document.getElementById('formCategory').value = parsed.category;
+      document.getElementById('formStartDate').value = parsed.startDate;
+      document.getElementById('formEndDate').value = parsed.endDate;
+      document.getElementById('formDueTime').value = parsed.dueTime;
+      document.getElementById('formSubject').value = parsed.subject;
+      document.getElementById('formEvalMethod').value = parsed.evalMethod;
+      document.getElementById('formMaterials').value = parsed.materials.join(', ');
+      document.getElementById('formDescription').value = parsed.description;
+
+      if (state.currentUser.role === 'teacher') {
+        document.getElementById('formScope').value = parsed.scope;
+        document.getElementById('formTargetGrade').value = parsed.targetGrade;
+        document.getElementById('formTargetClass').value = parsed.targetClass;
+      }
+
+      updateFormScopeVisibility();
+      showToast('AI가 일정 문장을 성공적으로 분석하여 입력 폼을 채웠습니다! ⚡', 'success');
+    }
+  });
+
+  // AI Auto Suggest Assessment Details Button inside Form
+  document.getElementById('aiSuggestAssessmentDetailsBtn').addEventListener('click', () => {
+    const title = document.getElementById('formTitle').value;
+    const cat = document.getElementById('formCategory').value;
+
+    if (!title) {
+      showToast('먼저 일정 제목을 입력해 주시면 AI가 관련 과목과 평가 방식을 추천합니다.', 'warning');
+      return;
+    }
+
+    // Smart inference
+    if (title.includes('인공지능') || title.includes('AI') || title.includes('컴퓨터') || title.includes('정보')) {
+      document.getElementById('formSubject').value = '인공지능 기초';
+      document.getElementById('formEvalMethod').value = '탐구 보고서 및 소스코드 포트폴리오 제출';
+      document.getElementById('formMaterials').value = '노트북, 활동지, USB';
+      document.getElementById('formDescription').value = '인공지능 교과 성취기준에 맞춰 실생활 문제 해결 모델 설계 및 윤리적 쟁점 분석 보고서를 제출합니다.';
+    } else if (title.includes('수학') || title.includes('미분') || title.includes('적분')) {
+      document.getElementById('formSubject').value = '수학Ⅱ';
+      document.getElementById('formEvalMethod').value = '실생활 연계 문제 해결 서술형 지필';
+      document.getElementById('formMaterials').value = '공학용 계산기, 자, 샤프';
+      document.getElementById('formDescription').value = '수학적 개념의 정확한 정의와 서술 과정을 논리적으로 전개하여 답안지에 작성합니다.';
+    } else if (title.includes('영어') || title.includes('스피치') || title.includes('에세이')) {
+      document.getElementById('formSubject').value = '영어Ⅰ';
+      document.getElementById('formEvalMethod').value = '주제 발표 및 영문에세이 작성';
+      document.getElementById('formMaterials').value = '영한사전, 발표 대본, PPT';
+      document.getElementById('formDescription').value = '주제에 대한 논거를 3가지 이상 들어 3분간 유창하게 영어로 발표합니다.';
+    } else {
+      document.getElementById('formSubject').value = '일반 교과';
+      document.getElementById('formEvalMethod').value = '개인 탐구 보고서 제출';
+      document.getElementById('formMaterials').value = '필기도구, 참고자료 출력물';
+      document.getElementById('formDescription').value = '성취기준에 부합하는 탐구 결과물을 작성하여 기한 내에 제출합니다.';
+    }
+
+    showToast('AI 추천 정보가 폼에 자동 입력되었습니다!', 'success');
+  });
+
+  // Form Scope change listener
+  document.getElementById('formScope').addEventListener('change', updateFormScopeVisibility);
+
+  // Form Submit Handler
+  document.getElementById('eventForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('formEventId').value || `evt-${Date.now()}`;
+    const title = document.getElementById('formTitle').value.trim();
+    const category = document.getElementById('formCategory').value;
+    const scope = document.getElementById('formScope').value;
+    const targetGrade = (scope === 'school') ? null : parseInt(document.getElementById('formTargetGrade').value);
+    const targetClass = (scope === 'class') ? parseInt(document.getElementById('formTargetClass').value) : null;
+    const startDate = document.getElementById('formStartDate').value;
+    const endDate = document.getElementById('formEndDate').value;
+    const dueTime = document.getElementById('formDueTime').value;
+    const subject = document.getElementById('formSubject').value.trim();
+    const evalMethod = document.getElementById('formEvalMethod').value.trim();
+    const rawMaterials = document.getElementById('formMaterials').value;
+    const materials = rawMaterials.split(',').map(m => m.trim()).filter(Boolean);
+    const description = document.getElementById('formDescription').value.trim();
+
+    // Permission double check
+    if (!canUserCreate(scope, targetGrade, targetClass)) {
+      showToast('해당 범위에 일정을 등록할 수 있는 권한이 없습니다.', 'error');
+      return;
+    }
+
+    const eventObj = {
+      id,
+      title,
+      category,
+      scope,
+      targetGrade,
+      targetClass,
+      startDate,
+      endDate: endDate || startDate,
+      dueTime,
+      subject,
+      evalMethod,
+      materials,
+      description,
+      authorRole: state.currentUser.role,
+      authorName: state.currentUser.role === 'teacher' ? '교사' : `${state.currentUser.grade}-${state.currentUser.classNum} 반장`
+    };
+
+    const existingIndex = state.events.findIndex(ev => ev.id === id);
+    if (existingIndex >= 0) {
+      state.events[existingIndex] = eventObj;
+      showToast('일정이 성공적으로 수정되었습니다.', 'success');
+    } else {
+      state.events.push(eventObj);
+      showToast('새 일정이 성공적으로 등록되었습니다!', 'success');
+    }
+
+    saveEvents();
+    closeModal('eventFormModal');
+    renderApp();
+  });
+
+  // Clear completed checks
+  document.getElementById('clearCompletedChecksBtn').addEventListener('click', () => {
+    Object.keys(state.suppliesChecks).forEach(k => {
+      if (state.suppliesChecks[k]) delete state.suppliesChecks[k];
+    });
+    saveChecks();
+    renderSuppliesChecklist();
+    showToast('완료된 준비물 항목을 정리했습니다.', 'success');
+  });
+
+  // Reset to demo data
+  document.getElementById('resetDemoDataBtn').addEventListener('click', resetToDefaultData);
+
+  // Close modals on backdrop click or close button
+  document.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modalId = btn.getAttribute('data-close-modal');
+      closeModal(modalId);
+    });
+  });
+
+  document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) {
+        backdrop.style.display = 'none';
+      }
+    });
+  });
+}
+
+// --- 13. General Helpers & Utilities ---
+function formatDateStr(dateObj) {
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function isDateInRange(targetDateStr, startDateStr, endDateStr) {
+  const end = endDateStr || startDateStr;
+  return targetDateStr >= startDateStr && targetDateStr <= end;
+}
+
+function getDaysDifference(fromStr, toStr) {
+  const from = new Date(fromStr + 'T00:00:00');
+  const to = new Date(toStr + 'T00:00:00');
+  const diffTime = to - from;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function getDDayText(startDateStr) {
+  const diff = getDaysDifference(TODAY_STR, startDateStr);
+  if (diff === 0) return 'D-Day';
+  if (diff > 0) return `D-${diff}`;
+  return `D+${Math.abs(diff)}`;
+}
+
+function getDDayBadgeClass(startDateStr) {
+  const diff = getDaysDifference(TODAY_STR, startDateStr);
+  if (diff <= 1) return 'dday-urgent';
+  if (diff <= 3) return 'dday-soon';
+  return 'dday-normal';
+}
+
+function getCategoryLabel(category) {
+  const map = {
+    assessment: '수행평가/과제',
+    exam: '시험/평가',
+    school_event: '학교행사',
+    grade_event: '학년행사',
+    class_event: '학급행사',
+    holiday: '공휴/재량휴업'
+  };
+  return map[category] || '일정';
+}
+
+function getCategoryEmoji(category) {
+  const map = {
+    assessment: '🟣',
+    exam: '🔴',
+    school_event: '🟢',
+    grade_event: '🟡',
+    class_event: '🔵',
+    holiday: '⚪'
+  };
+  return map[category] || '📌';
+}
+
+function getScopeLabel(event) {
+  if (event.scope === 'school') return '학교 전체';
+  if (event.scope === 'grade') return `${event.targetGrade}학년 전체`;
+  if (event.scope === 'class') return `${event.targetGrade}학년 ${event.targetClass}반`;
+  return '전체';
+}
+
+function getRoleLabel(role) {
+  if (role === 'teacher') return '교사';
+  if (role === 'president') return '반장';
+  return '학생';
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+
+  const icon = type === 'success' ? '✅' : (type === 'warning' ? '⚠️' : '❌');
+  toast.innerHTML = `<span>${icon}</span> <span>${escapeHtml(message)}</span>`;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// Start app on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', initApp);
+
+
+</script>
+</body>
+</html>
+
